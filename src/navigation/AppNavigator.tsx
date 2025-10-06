@@ -1,53 +1,55 @@
+// src/navigation/AppNavigator.tsx
 import React from "react";
-import { Text } from "react-native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text, TouchableOpacity } from "react-native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import HomeScreen from "../screens/HomeScreen";
 import TimerScreen from "../screens/TimerScreen";
 import CollectionScreen from "../screens/CollectionScreen";
 
-const Tab = createBottomTabNavigator();
+export type RootStackParamList = {
+  Timer: undefined;
+  Collection: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const theme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: "#FFF8E1" },
+};
 
 export default function AppNavigator() {
   return (
-    <Tab.Navigator
+    <Stack.Navigator
+      initialRouteName="Timer"
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#FF5722",
-        tabBarInactiveTintColor: "#8D6E63",
-        tabBarStyle: { backgroundColor: "#FFF1D0" },
+        headerStyle: { backgroundColor: "#FFF1D0" },
+        headerTitleStyle: { fontWeight: "800", color: "#FF5722" },
+        headerTintColor: "#6D4C41",
       }}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: "홈",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🏠</Text>
-          ),
-        }}
-      />
-      <Tab.Screen
+      <Stack.Screen
         name="Timer"
         component={TimerScreen}
-        options={{
-          tabBarLabel: "타이머",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>⏱️</Text>
+        options={({ navigation }) => ({
+          title: "집중",
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Collection")}
+              accessibilityLabel="도감 열기"
+              style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+            >
+              <Text style={{ fontSize: 18 }}>🍣</Text>
+            </TouchableOpacity>
           ),
-        }}
+        })}
       />
-      <Tab.Screen
+      <Stack.Screen
         name="Collection"
         component={CollectionScreen}
-        options={{
-          tabBarLabel: "도감",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🍣</Text>
-          ),
-        }}
+        options={{ title: "도감" }}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 }
