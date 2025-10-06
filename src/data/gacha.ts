@@ -1,7 +1,5 @@
-import raw from "./sushi.json";
-import { withResolvedImages } from "./sushiImage";
-import type { Rarity, Sushi, SushiBase } from "../types";
-import { isSushiBaseArray } from "../types";
+import type { Rarity, Sushi } from "../types";
+import { SUSHI } from "./sushi";
 
 export const DEFAULT_WEIGHTS: Record<Rarity, number> = {
   common: 70,
@@ -15,15 +13,7 @@ let weights: Record<Rarity, number> = { ...DEFAULT_WEIGHTS };
 let cachedList: Sushi[] | null = null;
 
 export function getSushiList(): Sushi[] {
-  if (cachedList) return cachedList;
-
-  const list = raw as unknown as SushiBase[];
-  if (!isSushiBaseArray(list)) {
-    throw new Error("Invalid sushi.json schema");
-  }
-
-  cachedList = withResolvedImages(list);
-  return cachedList;
+  return SUSHI;
 }
 
 function pickRarity(): Rarity {

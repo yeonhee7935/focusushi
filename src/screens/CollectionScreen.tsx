@@ -32,6 +32,7 @@ export default function CollectionScreen() {
   const joined: Joined[] = useMemo(() => {
     const all = getSushiList(); // 캐시된 전체 목록
     const byId = Object.fromEntries(all.map((s) => [s.id, s]));
+    console.log(byId);
     return owned
       .map((o) => (byId[o.id] ? { sushi: byId[o.id], count: o.count } : null))
       .filter((x): x is Joined => !!x)
