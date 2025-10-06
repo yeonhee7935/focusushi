@@ -1,5 +1,4 @@
-// src/screens/TimerScreen.tsx
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -11,24 +10,28 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import ConfirmExitModal from "../components/ConfirmExitModal";
+import RewardModal from "../components/RewardModal";
+import { rollSushi } from "../data/gacha";
+import { recordAcquisition } from "../db";
+import type { Sushi } from "../types";
 
 const CHEF_IMAGE: ImageSourcePropType = require("../../assets/character/chef.png");
 
 export default function TimerScreen() {
   const { isRunning, phase, start, pause, reset, mmss } = usePomodoroTimer({
+    focusSeconds: 1,
     autoStartBreak: false,
+    onFocusComplete: () => {
+      const got = rollSushi();
+      recordAcquisition(got.id).catch(() => {});
+      setReward(got);
+      setRewardOpen(true);
+    },
   });
 
-  const [shouldAutoStart, setShouldAutoStart] = useState(true);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  useEffect(() => {
-    if (shouldAutoStart && !isRunning && phase === "focus") {
-      start();
-      setShouldAutoStart(false);
-    }
-  }, [shouldAutoStart, isRunning, phase, start]);
+  const [rewardOpen, setRewardOpen] = useState(false);
+  const [reward, setReward] = useState<Sushi | null>(null);
 
   const handleStart = useCallback(() => {
     if (!isRunning && phase === "focus") {
@@ -37,8 +40,8 @@ export default function TimerScreen() {
   }, [isRunning, phase, start]);
 
   const onPressExit = useCallback(() => {
-    setConfirmOpen(true);
-  }, []);
+    if (isRunning) setConfirmOpen(true);
+  }, [isRunning]);
 
   const keepFocusing = useCallback(() => {
     setConfirmOpen(false);
@@ -46,10 +49,13 @@ export default function TimerScreen() {
 
   const confirmExit = useCallback(() => {
     setConfirmOpen(false);
-    setShouldAutoStart(false);
     pause();
     reset();
   }, [pause, reset]);
+
+  const closeReward = useCallback(() => {
+    setRewardOpen(false);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,11 +66,15 @@ export default function TimerScreen() {
           resizeMode="contain"
         />
         <Text style={styles.timeText}>{mmss()}</Text>
+
         {isRunning ? (
           <TouchableOpacity
-            style={[styles.exitBtn, confirmOpen && styles.disabledBtn]}
+            style={[
+              styles.exitBtn,
+              (confirmOpen || rewardOpen) && styles.disabledBtn,
+            ]}
             onPress={onPressExit}
-            disabled={confirmOpen}
+            disabled={confirmOpen || rewardOpen}
             accessibilityLabel="세션 종료"
           >
             <Text style={styles.exitText}>종료</Text>
@@ -79,10 +89,18 @@ export default function TimerScreen() {
           </TouchableOpacity>
         )}
       </View>
+
       <ConfirmExitModal
         visible={confirmOpen}
         onKeep={keepFocusing}
         onExit={confirmExit}
+      />
+
+      <RewardModal
+        visible={rewardOpen}
+        sushi={reward}
+        onConfirm={closeReward}
+        onClose={closeReward}
       />
     </SafeAreaView>
   );
@@ -99,11 +117,12 @@ const styles = StyleSheet.create({
   },
   character: { width: 260, height: 260 },
   timeText: { fontSize: 32, fontWeight: "900", color: "#333", marginTop: 4 },
+
   startBtn: {
     marginTop: 8,
     paddingHorizontal: 22,
     paddingVertical: 12,
-    backgroundColor: "#42A5F5", // 시작은 파란색 계열로 구분
+    backgroundColor: "#42A5F5",
     borderRadius: 12,
   },
   startText: { color: "#fff", fontWeight: "900", fontSize: 16 },
@@ -116,5 +135,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   exitText: { color: "#fff", fontWeight: "900", fontSize: 16 },
+
   disabledBtn: { opacity: 0.6 },
 });
