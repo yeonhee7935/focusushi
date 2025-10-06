@@ -6,25 +6,18 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
   ActivityIndicator,
 } from "react-native";
 import type { Sushi } from "../types";
-import { palette, RARITY_COLORS, RARITY_LABELS } from "../theme";
+import { RARITY_COLORS, RARITY_LABELS, palette } from "../theme";
 
 type Props = {
   visible: boolean;
   sushi: Sushi | null;
   onConfirm?: (sushi: Sushi) => Promise<void> | void;
-  onClose?: () => void;
 };
 
-export default function RewardModal({
-  visible,
-  sushi,
-  onConfirm,
-  onClose,
-}: Props) {
+export default function RewardModal({ visible, sushi, onConfirm }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const badgeStyle = useMemo(
@@ -50,12 +43,10 @@ export default function RewardModal({
       transparent
       animationType="fade"
       statusBarTranslucent
+      onRequestClose={() => {}}
     >
-      <Pressable
-        style={styles.backdrop}
-        onPress={submitting ? undefined : onClose}
-      >
-        <Pressable onPress={() => {}} style={styles.card}>
+      <View style={styles.backdrop}>
+        <View style={styles.card}>
           <Text style={styles.title}>보상 획득!</Text>
 
           {sushi ? (
@@ -84,14 +75,6 @@ export default function RewardModal({
 
           <View style={styles.actions}>
             <TouchableOpacity
-              style={[styles.btn, styles.secondary]}
-              onPress={onClose}
-              disabled={submitting}
-            >
-              <Text style={styles.btnTextSecondary}>닫기</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
               style={[
                 styles.btn,
                 styles.primary,
@@ -99,16 +82,17 @@ export default function RewardModal({
               ]}
               onPress={handleConfirm}
               disabled={!sushi || submitting}
+              accessibilityLabel="확인"
             >
               {submitting ? (
                 <ActivityIndicator />
               ) : (
-                <Text style={styles.btnTextPrimary}>수집함에 추가</Text>
+                <Text style={styles.btnTextPrimary}>확인</Text>
               )}
             </TouchableOpacity>
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -171,9 +155,8 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   placeholderText: { color: "#666" },
-  actions: { flexDirection: "row", gap: 10, marginTop: 16 },
+  actions: { marginTop: 16 },
   btn: {
-    flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
@@ -181,7 +164,5 @@ const styles = StyleSheet.create({
   },
   primary: { backgroundColor: palette.primary },
   btnDisabled: { opacity: 0.6 },
-  secondary: { backgroundColor: palette.secondary },
   btnTextPrimary: { color: "#fff", fontWeight: "800" },
-  btnTextSecondary: { color: "#8D6E63", fontWeight: "800" },
 });

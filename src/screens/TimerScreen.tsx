@@ -95,12 +95,10 @@ export default function TimerScreen() {
         onKeep={keepFocusing}
         onExit={confirmExit}
       />
-
       <RewardModal
         visible={rewardOpen}
         sushi={reward}
         onConfirm={closeReward}
-        onClose={closeReward}
       />
     </SafeAreaView>
   );
