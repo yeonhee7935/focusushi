@@ -14,17 +14,19 @@ import RewardModal from "../components/RewardModal";
 import { rollSushi } from "../data/gacha";
 import { recordAcquisition } from "../db";
 import type { Sushi } from "../types";
+import { notifyFocusSuccess } from "../notifications";
 
 const CHEF_IMAGE: ImageSourcePropType = require("../../assets/character/chef.png");
 
 export default function TimerScreen() {
   const { isRunning, phase, start, pause, reset, mmss } = usePomodoroTimer({
-    focusSeconds: 1,
+    focusSeconds: 10,
     autoStartBreak: false,
     onFocusComplete: () => {
-      const got = rollSushi();
-      recordAcquisition(got.id).catch(() => {});
-      setReward(got);
+      const sushi = rollSushi();
+      recordAcquisition(sushi.id).catch(() => {});
+      notifyFocusSuccess("초밥이 완성되었어요!");
+      setReward(sushi);
       setRewardOpen(true);
     },
   });
@@ -34,9 +36,7 @@ export default function TimerScreen() {
   const [reward, setReward] = useState<Sushi | null>(null);
 
   const handleStart = useCallback(() => {
-    if (!isRunning && phase === "focus") {
-      start();
-    }
+    if (!isRunning && phase === "focus") start();
   }, [isRunning, phase, start]);
 
   const onPressExit = useCallback(() => {
@@ -57,6 +57,8 @@ export default function TimerScreen() {
     setRewardOpen(false);
   }, []);
 
+  const showExit = isRunning;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.stack}>
@@ -66,8 +68,7 @@ export default function TimerScreen() {
           resizeMode="contain"
         />
         <Text style={styles.timeText}>{mmss()}</Text>
-
-        {isRunning ? (
+        {showExit ? (
           <TouchableOpacity
             style={[
               styles.exitBtn,
@@ -95,6 +96,7 @@ export default function TimerScreen() {
         onKeep={keepFocusing}
         onExit={confirmExit}
       />
+
       <RewardModal
         visible={rewardOpen}
         sushi={reward}
@@ -115,7 +117,6 @@ const styles = StyleSheet.create({
   },
   character: { width: 260, height: 260 },
   timeText: { fontSize: 32, fontWeight: "900", color: "#333", marginTop: 4 },
-
   startBtn: {
     marginTop: 8,
     paddingHorizontal: 22,
@@ -124,7 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   startText: { color: "#fff", fontWeight: "900", fontSize: 16 },
-
   exitBtn: {
     marginTop: 8,
     paddingHorizontal: 22,
@@ -133,6 +133,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   exitText: { color: "#fff", fontWeight: "900", fontSize: 16 },
-
   disabledBtn: { opacity: 0.6 },
 });
