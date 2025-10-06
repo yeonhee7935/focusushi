@@ -1,0 +1,26 @@
+[
+  {
+    "id": "계란",
+    "name": "계란초밥",
+    "rarity": "rare",
+    "imageFile": "gyeran.png"
+  },
+  {
+    "id": "광어",
+    "name": "광어초밥",
+    "rarity": "common",
+    "imageFile": "gwangu.png"
+  },
+  {
+    "id": "참치",
+    "name": "참치초밥",
+    "rarity": "common",
+    "imageFile": "chamchi.png"
+  },
+  {
+    "id": "한치",
+    "name": "한치초밥",
+    "rarity": "epic",
+    "imageFile": "hanchi.png"
+  }
+]
