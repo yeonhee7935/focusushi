@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,19 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import ConfirmExitModal from "../components/ConfirmExitModal";
 import RewardModal from "../components/RewardModal";
 import { rollSushi } from "../data/gacha";
 import { recordAcquisition } from "../db";
-import type { Sushi } from "../types";
 import { notifyFocusSuccess } from "../notifications";
+import type { Sushi } from "../types";
 
 const CHEF_IMAGE: ImageSourcePropType = require("../../assets/character/chef.png");
 
 export default function TimerScreen() {
+  const navigation = useNavigation<any>();
   const { isRunning, phase, start, pause, reset, mmss } = usePomodoroTimer({
     focusSeconds: 10,
     autoStartBreak: false,
@@ -35,6 +37,29 @@ export default function TimerScreen() {
   const [rewardOpen, setRewardOpen] = useState(false);
   const [reward, setReward] = useState<Sushi | null>(null);
 
+  const uiBlocked = confirmOpen || rewardOpen;
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            if (!uiBlocked) navigation.navigate("Collection");
+          }}
+          disabled={uiBlocked}
+          accessibilityLabel="도감 열기"
+          style={{
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            opacity: uiBlocked ? 0.5 : 1,
+          }}
+        >
+          <Text style={{ fontSize: 18 }}>🍣</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, uiBlocked]);
+
   const handleStart = useCallback(() => {
     if (!isRunning && phase === "focus") start();
   }, [isRunning, phase, start]);
@@ -43,19 +68,14 @@ export default function TimerScreen() {
     if (isRunning) setConfirmOpen(true);
   }, [isRunning]);
 
-  const keepFocusing = useCallback(() => {
-    setConfirmOpen(false);
-  }, []);
-
+  const keepFocusing = useCallback(() => setConfirmOpen(false), []);
   const confirmExit = useCallback(() => {
     setConfirmOpen(false);
     pause();
     reset();
   }, [pause, reset]);
 
-  const closeReward = useCallback(() => {
-    setRewardOpen(false);
-  }, []);
+  const closeReward = useCallback(() => setRewardOpen(false), []);
 
   const showExit = isRunning;
 
@@ -68,22 +88,21 @@ export default function TimerScreen() {
           resizeMode="contain"
         />
         <Text style={styles.timeText}>{mmss()}</Text>
+
         {showExit ? (
           <TouchableOpacity
-            style={[
-              styles.exitBtn,
-              (confirmOpen || rewardOpen) && styles.disabledBtn,
-            ]}
+            style={[styles.exitBtn, uiBlocked && styles.disabledBtn]}
             onPress={onPressExit}
-            disabled={confirmOpen || rewardOpen}
+            disabled={uiBlocked}
             accessibilityLabel="세션 종료"
           >
             <Text style={styles.exitText}>종료</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={styles.startBtn}
+            style={[styles.startBtn, uiBlocked && styles.disabledBtn]}
             onPress={handleStart}
+            disabled={uiBlocked}
             accessibilityLabel="세션 시작"
           >
             <Text style={styles.startText}>시작</Text>
