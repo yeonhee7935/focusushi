@@ -21,6 +21,7 @@ const SUCCESS_ASSET = require("../../assets/video/success.mp4");
 export default function TimerScreen() {
   const { isRunning, phase, start, pause, reset, mmss } = usePomodoroTimer({
     focusSeconds: 10,
+    breakSeconds: 10,
     autoStartBreak: false,
     onFocusComplete: () => {
       const got = rollSushi();
@@ -78,7 +79,6 @@ export default function TimerScreen() {
     }
   }, [isIdle, isFocusing, showSuccess, idlePlayer, focusPlayer, successPlayer]);
 
-  // ✅ 변경된 부분: success 영상 종료 감지 (간단한 방법)
   const playingEvt = useEvent(successPlayer, "playingChange");
 
   useEffect(() => {
@@ -90,9 +90,14 @@ export default function TimerScreen() {
   }, [showSuccess, playingEvt?.isPlaying]);
 
   const handleStart = useCallback(() => {
-    if (!isRunning && phase === "focus") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      start();
+    if (!isRunning) {
+      if (phase === "focus") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        start();
+      } else if (phase === "break") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        start();
+      }
     }
   }, [isRunning, phase, start]);
 
@@ -112,7 +117,6 @@ export default function TimerScreen() {
   }, [pause, reset]);
 
   const closeReward = useCallback(() => setRewardOpen(false), []);
-  console.log(isRunning, phase, showSuccess);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.stack}>
@@ -194,18 +198,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
-    gap: 16,
+    paddingHorizontal: 0,
+    gap: 10,
   },
   mediaBox: {
-    width: "90%", // 화면 너비 거의 다 차지
-    aspectRatio: 1, // 정방형 유지
-    backgroundColor: "#000", // 영상 박스도 검정
-    borderRadius: 12,
+    width: "100%",
+    aspectRatio: 1,
+    backgroundColor: "#000",
+    borderRadius: 0,
     overflow: "hidden",
   },
   media: { width: "100%", height: "100%" },
-  character: { width: "80%", aspectRatio: 1 }, // 캐릭터도 정방형
+  character: { width: "80%", aspectRatio: 1 },
   timeText: {
     fontSize: 32,
     fontWeight: "900",
@@ -217,7 +221,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 12,
     backgroundColor: "#42A5F5",
-    borderRadius: 12,
   },
   startText: { color: "#fff", fontWeight: "900", fontSize: 16 },
   exitBtn: {

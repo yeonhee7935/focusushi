@@ -7,6 +7,7 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { palette } from "../theme";
 
 const SPLASH_IMAGE: ImageSourcePropType = require("../../assets/character/chef_transparent.png");
 
@@ -26,7 +27,7 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF8E1" />
+      <StatusBar barStyle="dark-content" backgroundColor={palette.bg} />
       <Image source={SPLASH_IMAGE} style={styles.image} resizeMode="contain" />
     </View>
   );
@@ -35,7 +36,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8E1",
+    backgroundColor: palette.bg,
     alignItems: "center",
     justifyContent: "center",
   },

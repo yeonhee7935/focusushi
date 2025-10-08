@@ -6,6 +6,7 @@ import SushiCard from "../components/SushiCard";
 import { getCollection } from "../db";
 import { getSushiList } from "../data/gacha";
 import type { OwnedSushi, Sushi, Rarity } from "../types";
+import { palette } from "../theme";
 
 type Joined = { sushi: Sushi; count: number };
 
@@ -86,29 +87,47 @@ export default function CollectionScreen() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF8E1", padding: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: palette.bg,
+    padding: 16,
+  },
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#FF5722",
+    color: palette.primary,
     textAlign: "center",
     marginVertical: 8,
   },
-  listContent: { paddingVertical: 8, paddingBottom: 24 },
-  row: { justifyContent: "space-between", marginBottom: 12 },
-  card: { width: "48%" },
+  listContent: {
+    paddingVertical: 8,
+    paddingBottom: 24,
+  },
+  row: {
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  card: {
+    width: "48%",
+  },
 
   empty: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: palette.surface,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 12,
     padding: 24,
   },
-  emptyTitle: { fontSize: 16, fontWeight: "800", color: "#333" },
-  emptySubtitle: { marginTop: 6, color: "#666" },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: palette.text,
+  },
+  emptySubtitle: {
+    marginTop: 6,
+    color: palette.textSecondary,
+  },
 });

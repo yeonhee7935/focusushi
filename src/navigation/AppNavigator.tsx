@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import TimerScreen from "../screens/TimerScreen";
 import CollectionScreen from "../screens/CollectionScreen";
+import { palette } from "../theme";
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -16,7 +17,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const theme = {
   ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: "#FFF8E1" },
+  colors: { ...DefaultTheme.colors, background: palette.bg },
 };
 
 export default function AppNavigator() {
@@ -25,7 +26,7 @@ export default function AppNavigator() {
       <Stack.Navigator
         initialRouteName="Timer"
         screenOptions={{
-          headerStyle: { backgroundColor: "#FFF1D0" },
+          headerStyle: { backgroundColor: palette.bg },
           headerTitleStyle: { fontWeight: "800", color: "#FF5722" },
           headerTintColor: "#6D4C41",
         }}
