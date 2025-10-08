@@ -1,23 +1,40 @@
-import React, { useEffect } from "react";
+// App.tsx
+import "react-native-gesture-handler";
+import React, { useCallback, useEffect, useState } from "react";
+import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./src/navigation/AppNavigator";
-import { initNotifications } from "./src/notifications";
+import * as SplashScreen from "expo-splash-screen";
+import { Asset } from "expo-asset";
 
-const theme = {
-  ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: "#FFF8E1" },
-};
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function App() {
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    initNotifications();
+    (async () => {
+      try {
+        await Asset.fromModule(
+          require("./assets/character/chef_transparent.png")
+        ).downloadAsync();
+      } finally {
+        setReady(true);
+      }
+    })();
   }, []);
+
+  const onLayout = useCallback(async () => {
+    if (ready) {
+      await SplashScreen.hideAsync();
+    }
+  }, [ready]);
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={theme}>
+      <View style={{ flex: 1 }} onLayout={onLayout}>
         <AppNavigator />
-      </NavigationContainer>
+      </View>
     </SafeAreaProvider>
   );
 }

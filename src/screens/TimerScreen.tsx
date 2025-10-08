@@ -17,7 +17,7 @@ import { recordAcquisition } from "../db";
 import { notifyFocusSuccess } from "../notifications";
 import type { Sushi } from "../types";
 
-const CHEF_IMAGE: ImageSourcePropType = require("../../assets/character/chef.png");
+const CHEF_IMAGE: ImageSourcePropType = require("../../assets/character/chef_transparent.png");
 
 export default function TimerScreen() {
   const navigation = useNavigation<any>();

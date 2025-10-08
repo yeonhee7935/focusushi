@@ -8,9 +8,9 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/character/chef_transparent.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFF8E1"
     },
     "ios": {
       "supportsTablet": true,
@@ -29,6 +29,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-sqlite", "expo-notifications"]
+    "plugins": ["expo-sqlite", "expo-notifications", "expo-splash-screen"]
   }
 }
