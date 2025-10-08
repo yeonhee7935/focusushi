@@ -1,12 +1,12 @@
 import type { Rarity, RarityColorMap } from "./types";
 
 export const palette = {
-  bg: "#FFF8E1",
-  surface: "#FFFFFF",
+  bg: "#000000",
+  surface: "#1C1C1C",
   primary: "#FF5722",
-  secondary: "#FFE0B2",
-  text: "#333",
-  textSecondary: "#6D4C41",
+  secondary: "#333333",
+  text: "#FFFFFF",
+  textSecondary: "#AAAAAA",
 };
 
 export const RARITY_COLORS: RarityColorMap = {
