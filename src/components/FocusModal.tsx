@@ -273,13 +273,29 @@ export default function FocusModal({ visible, onClose }: Props) {
         {/* 영상: 정방형, 위치 고정 */}
         <View style={styles.mediaBox}>
           {focusState === "successVideo" ? (
-            <VideoView player={successPlayer} style={styles.media} />
+            <VideoView
+              player={successPlayer}
+              style={styles.media}
+              nativeControls={false}
+            />
           ) : focusState === "focusing" || focusState === "confirmExit" ? (
-            <VideoView player={focusPlayer} style={styles.media} />
+            <VideoView
+              player={focusPlayer}
+              style={styles.media}
+              nativeControls={false}
+            />
           ) : focusState === "breaking" ? (
-            <VideoView player={idlePlayer} style={styles.media} />
+            <VideoView
+              player={idlePlayer}
+              style={styles.media}
+              nativeControls={false}
+            />
           ) : (
-            <VideoView player={idlePlayer} style={styles.media} />
+            <VideoView
+              player={idlePlayer}
+              style={styles.media}
+              nativeControls={false}
+            />
           )}
         </View>
 
