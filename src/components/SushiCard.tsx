@@ -8,93 +8,81 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import type { Sushi } from "../types";
-import { palette, RARITY_COLORS, RARITY_LABELS } from "../theme";
 
 type Props = {
   sushi: Sushi;
   count?: number;
-  onPress?: () => void;
+  locked: boolean; // 필수: 미획득 여부
+  onPress: () => void; // 필수: 카드 탭
   style?: StyleProp<ViewStyle>;
 };
 
-export default function SushiCard({ sushi, count, onPress, style }: Props) {
-  const Container = onPress ? Pressable : View;
+export default function SushiCard({
+  sushi,
+  count,
+  locked,
+  onPress,
+  style,
+}: Props) {
   return (
-    <Container
+    <Pressable
       onPress={onPress}
-      style={[styles.card, style, { borderColor: RARITY_COLORS[sushi.rarity] }]}
-      accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={`${sushi.name}, ${RARITY_LABELS[sushi.rarity]}${typeof count === "number" ? `, 보유 ${count}개` : ""}`}
+      style={[styles.card, style]}
+      accessibilityRole="button"
+      accessibilityLabel={`${sushi.name}${
+        typeof count === "number" ? `, 보유 ${count}개` : ""
+      }${locked ? ", 잠김" : ""}`}
       testID={`SushiCard_${sushi.id}`}
     >
-      <View style={styles.imageWrap}>
-        <Image source={sushi.image} resizeMode="contain" style={styles.image} />
+      <View style={styles.imageBox}>
+        {locked ? (
+          <Ionicons name="lock-closed" size={32} color="#8a8a8a" />
+        ) : (
+          <Image
+            source={sushi.image}
+            resizeMode="contain"
+            style={styles.image}
+          />
+        )}
       </View>
 
-      <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
-          {sushi.name}
-        </Text>
-        <View
-          style={[
-            styles.badge,
-            { backgroundColor: RARITY_COLORS[sushi.rarity] },
-          ]}
-        >
-          <Text style={styles.badgeText}>{RARITY_LABELS[sushi.rarity]}</Text>
-        </View>
-      </View>
-
-      {typeof count === "number" && (
-        <View style={styles.countBubble}>
-          <Text style={styles.countText}>× {count}</Text>
-        </View>
-      )}
-    </Container>
+      <Text
+        style={[styles.name, locked && styles.nameLocked]}
+        numberOfLines={1}
+      >
+        {sushi.name}
+      </Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.surface,
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 2,
-    width: 140,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    alignItems: "center",
   },
-  imageWrap: {
-    backgroundColor: palette.bg,
+  imageBox: {
+    backgroundColor: "#222", // 동일 회색 박스
     borderRadius: 12,
+    width: "100%",
+    aspectRatio: 1, // 정방형 유지
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
-    height: 100,
+    overflow: "hidden",
   },
-  image: { width: "100%", height: "100%" },
-  info: { flexDirection: "row", alignItems: "center", marginTop: 10, gap: 8 },
-  name: { flex: 1, fontSize: 14, fontWeight: "700", color: palette.text },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    alignSelf: "flex-start",
+  image: {
+    width: "100%",
+    height: "100%",
   },
-  badgeText: { color: "#fff", fontSize: 11, fontWeight: "800" },
-  countBubble: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    backgroundColor: palette.primary,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+  name: {
+    fontSize: 17, // 이름 크게
+    fontWeight: "800",
+    color: "#f5f5f5",
+    marginTop: 10,
+    textAlign: "center",
   },
-  countText: { color: "#fff", fontSize: 12, fontWeight: "800" },
+  nameLocked: {
+    color: "#9a9a9a",
+  },
 });
