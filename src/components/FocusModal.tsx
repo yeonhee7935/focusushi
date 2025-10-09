@@ -182,11 +182,7 @@ export default function FocusModal({ visible, onClose }: Props) {
     setTimeout(() => onClose(), 50);
   };
 
-  const showTimer = !(
-    focusState === "successVideo" ||
-    focusState === "reward" ||
-    focusState === "confirmBreak"
-  );
+  const showTimer = focusState === "focusing" || focusState === "breaking";
 
   const showExitButton = focusState === "focusing" || focusState === "breaking"; // ✅ 휴식 중에도 노출
 
