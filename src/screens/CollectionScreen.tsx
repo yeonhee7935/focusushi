@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   card: { width: "30%" },
   empty: {
     flex: 1,
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#272727ff",
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",

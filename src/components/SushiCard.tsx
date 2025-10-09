@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageBox: {
-    backgroundColor: "#222", // 동일 회색 박스
+    backgroundColor: "#3e3e3eff", // 동일 회색 박스
     borderRadius: 12,
     width: "100%",
     aspectRatio: 1, // 정방형 유지

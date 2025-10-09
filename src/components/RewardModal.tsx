@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     maxWidth: 420,
-    backgroundColor: palette.bg,
+    backgroundColor: "#FFF8E1",
     borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
@@ -117,16 +117,15 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
-    color: palette.primary,
+    color: "#FF5722",
     textAlign: "center",
-    marginBottom: 8,
   },
   imageWrap: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: palette.surface,
+    backgroundColor: "#fbe8aaff",
     borderRadius: 12,
     padding: 12,
     marginTop: 6,
@@ -135,7 +134,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "700",
-    color: palette.text,
+    color: "#6D4C41",
     textAlign: "center",
     marginTop: 12,
   },

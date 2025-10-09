@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
     maxWidth: 420,
-    backgroundColor: palette.bg,
+    backgroundColor: "#FFF8E1",
     borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "800",
-    color: palette.text,
+    color: "#FF5722",
     textAlign: "center",
   },
   message: {
     marginTop: 8,
-    color: palette.textSecondary,
+    color: "#6D4C41",
     textAlign: "center",
   },
   actions: { flexDirection: "row", gap: 10, marginTop: 16 },
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  primary: { backgroundColor: palette.primary },
+  primary: { backgroundColor: "#FF5722" },
   primaryText: { color: "#fff", fontWeight: "800" },
-  secondary: { backgroundColor: palette.surface },
-  secondaryText: { color: palette.text, fontWeight: "800" },
+  secondary: { backgroundColor: "#FFE0B2" },
+  secondaryText: { color: "#6D4C41", fontWeight: "800" },
 });

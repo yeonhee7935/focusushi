@@ -49,8 +49,8 @@ export default function FocusModal({ visible, onClose }: Props) {
   const autoStartBreak = false;
 
   const { start, pause, reset, skip, mmss } = usePomodoroTimer({
-    focusSeconds: 30,
-    breakSeconds: 50,
+    focusSeconds: 3,
+    breakSeconds: 5,
     autoStartBreak, // false: 포커스 종료 후 휴식 자동시작 안 함(사용자 선택)
     onFocusComplete: async () => {
       // 포커스 종료 → 보상 플로우
