@@ -7,6 +7,7 @@ export type Sushi = {
   name: string;
   rarity: Rarity;
   image: ImageSourcePropType;
+  description: string;
 };
 
 export type OwnedSushi = {
