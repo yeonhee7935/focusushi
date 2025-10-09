@@ -5,6 +5,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
 
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
+import ConfirmExitModal from "./../components/ConfirmExitModal";
 import { palette } from "../theme";
 
 const IDLE_ASSET = require("../../assets/video/idle.mp4");
@@ -21,7 +22,7 @@ type Props = {
 export default function FocusModal({ visible, onClose }: Props) {
   const [focusState, setFocusState] = useState<FocusSessionState>("idle");
 
-  const { start, mmss, reset } = usePomodoroTimer({
+  const { start, pause, reset, mmss } = usePomodoroTimer({
     focusSeconds: 10,
     breakSeconds: 10,
     autoStartBreak: false,
@@ -29,7 +30,7 @@ export default function FocusModal({ visible, onClose }: Props) {
       setFocusState("successVideo");
     },
     onBreakComplete: () => {
-      // 1단계에선 휴식 미사용 (다음 단계 예정)
+      // 다음 단계에서 휴식 연결
     },
   });
 
@@ -47,12 +48,12 @@ export default function FocusModal({ visible, onClose }: Props) {
     p.muted = true;
   });
 
-  // 성공 영상 종료 감지 (간단/안정)
+  // 성공 영상 종료 감지
   const playingEvt = useEvent(successPlayer, "playingChange");
   useEffect(() => {
     if (focusState === "successVideo" && playingEvt?.isPlaying === false) {
       console.log("🎉 성공 영상 종료됨");
-      // 다음 단계에서 RewardModal로 연결
+      // 다음 단계에서 RewardModal로 전환 예정
     }
   }, [focusState, playingEvt]);
 
@@ -73,10 +74,13 @@ export default function FocusModal({ visible, onClose }: Props) {
       successPlayer.play();
       idlePlayer.pause();
       focusPlayer.pause();
+    } else if (focusState === "confirmExit") {
+      idlePlayer.pause();
+      focusPlayer.pause();
+      successPlayer.pause();
     }
   }, [focusState, idlePlayer, focusPlayer, successPlayer]);
 
-  // 모달 열릴 때 집중 시작 / 닫힐 때 초기화
   useEffect(() => {
     if (visible) {
       setFocusState("focusing");
@@ -87,21 +91,42 @@ export default function FocusModal({ visible, onClose }: Props) {
     }
   }, [visible]);
 
+  // 종료 버튼 핸들러 (컨펌 모달 띄우고 타이머 일시정지)
+  const onPressExit = () => {
+    if (focusState === "focusing") {
+      pause();
+      setFocusState("confirmExit");
+    }
+  };
+
+  // ConfirmExitModal 콜백들
+  const keepFocusing = () => {
+    setFocusState("focusing");
+    start();
+  };
+
+  const confirmExit = () => {
+    reset(); // 타이머 초기화
+    setFocusState("idle");
+    setTimeout(() => {
+      onClose();
+    }, 50);
+  };
+
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>
       <View style={styles.container}>
-        {/* 영상 영역: 정방형, 항상 동일 위치 */}
         <View style={styles.mediaBox}>
           {focusState === "successVideo" ? (
             <VideoView player={successPlayer} style={styles.media} />
-          ) : focusState === "focusing" ? (
+          ) : focusState === "focusing" || focusState === "confirmExit" ? (
             <VideoView player={focusPlayer} style={styles.media} />
           ) : (
             <VideoView player={idlePlayer} style={styles.media} />
           )}
         </View>
 
-        {/* 타이머: successVideo일 땐 자리 유지 + 숨김 */}
+        {/* 타이머: successVideo일 땐 숨김(자리 유지) */}
         <Text
           style={[
             styles.timeText,
@@ -111,20 +136,23 @@ export default function FocusModal({ visible, onClose }: Props) {
           {mmss()}
         </Text>
 
-        {/* 종료(취소) 버튼: focusing일 때만 활성/표시, successVideo일 땐 숨김 */}
+        {/* 종료 버튼: focusing에만 노출, success/confirmExit에서는 숨김(자리 유지) */}
         <TouchableOpacity
-          onPress={() => {
-            if (focusState === "focusing") {
-              setFocusState("confirmExit"); // 다음 단계에서 ConfirmExitModal 연결
-              console.log("종료 확인 모달 표시 예정");
-            }
-          }}
+          onPress={onPressExit}
           disabled={focusState !== "focusing"}
           style={[styles.exitBtn, focusState !== "focusing" && styles.hidden]}
+          accessibilityLabel="세션 종료"
         >
           <Text style={styles.exitText}>종료</Text>
         </TouchableOpacity>
       </View>
+
+      {/* 종료 확인 모달 */}
+      <ConfirmExitModal
+        visible={focusState === "confirmExit"}
+        onKeep={keepFocusing}
+        onExit={confirmExit}
+      />
     </Modal>
   );
 }
@@ -144,10 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  media: {
-    width: "100%",
-    height: "100%",
-  },
+  media: { width: "100%", height: "100%" },
   timeText: {
     fontSize: 32,
     fontWeight: "900",
@@ -163,6 +188,6 @@ const styles = StyleSheet.create({
   },
   exitText: { color: "#fff", fontWeight: "900", fontSize: 16 },
   hidden: {
-    opacity: 0, // visibility: hidden 대용 (공간 유지)
+    opacity: 0, // 공간 유지 (visibility: hidden 대용)
   },
 });
