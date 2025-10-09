@@ -25,6 +25,22 @@ function rarityPercent(r: Rarity) {
   return `${pct.toFixed(1)}%`;
 }
 
+// 희귀도 표시를 위한 한글 매핑 함수
+function getRarityName(r: Rarity): string {
+  switch (r) {
+    case "common":
+      return "일반";
+    case "rare":
+      return "희귀";
+    case "epic":
+      return "영웅";
+    case "legendary":
+      return "전설";
+    default:
+      return "알 수 없음";
+  }
+}
+
 type Props = {
   visible: boolean;
   onClose: () => void;
@@ -65,10 +81,24 @@ export default function SushiDetailModal({
             </View>
 
             <Text style={styles.title}>{sushi.name}</Text>
-            <Text style={styles.meta}>
-              희귀도 확률: {rarityPercent(sushi.rarity)}
-            </Text>
-            <Text style={styles.meta}>총 보유: {count}개</Text>
+
+            {/* 초밥 설명: React Native의 Text는 기본적으로 띄어쓰기 단위로 줄 바꿈 처리됩니다. */}
+            <Text style={styles.description}>{sushi.description}</Text>
+
+            <View style={styles.rarityContainer}>
+              <Text style={styles.rarityLabel}>
+                {getRarityName(sushi.rarity)} 등급
+              </Text>
+              <Text style={styles.meta}>
+                (획득 확률: {rarityPercent(sushi.rarity)})
+              </Text>
+            </View>
+
+            <Text style={styles.countText}>총 보유: {count}개</Text>
+
+            <Pressable style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>닫기</Text>
+            </Pressable>
           </View>
         </TouchableWithoutFeedback>
       </Pressable>
@@ -101,16 +131,54 @@ const styles = StyleSheet.create({
   },
   image: { width: "90%", height: "90%" },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "900",
     color: "#111",
     marginTop: 16,
     textAlign: "center",
   },
+  description: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 10,
+    marginBottom: 20,
+    textAlign: "center",
+    lineHeight: 20,
+    paddingHorizontal: 10,
+  },
+  rarityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  rarityLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#007AFF",
+    marginRight: 5,
+  },
   meta: {
     fontSize: 13,
     color: "#666",
-    marginTop: 6,
     textAlign: "center",
+  },
+  countText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111",
+    marginTop: 15,
+    marginBottom: 20,
+  },
+  closeButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
   },
 });
