@@ -26,7 +26,7 @@ type FocusSessionState =
   | "reward"
   | "confirmExit"
   | "confirmBreak"
-  | "break"; // 🆕 휴식 상태 추가
+  | "breaking"; // 🆕 휴식 상태 추가
 
 type Props = {
   visible: boolean;
@@ -40,9 +40,9 @@ export default function FocusModal({ visible, onClose }: Props) {
   // 현재 단계에선 자동휴식 off 가정 (MVP)
   const autoStartBreak = false;
 
-  const { start, pause, reset, mmss } = usePomodoroTimer({
+  const { start, pause, reset, skip, mmss } = usePomodoroTimer({
     focusSeconds: 3,
-    breakSeconds: 3,
+    breakSeconds: 5,
     autoStartBreak, // false: 포커스 종료 후 휴식 자동시작 안 함(사용자 선택)
     onFocusComplete: async () => {
       // 포커스 종료 → 보상 플로우
@@ -103,7 +103,7 @@ export default function FocusModal({ visible, onClose }: Props) {
       successPlayer.play();
       idlePlayer.pause();
       focusPlayer.pause();
-    } else if (focusState === "break") {
+    } else if (focusState === "breaking") {
       // 휴식 중엔 잔잔한 idle 영상을 사용
       idlePlayer.play();
       focusPlayer.pause();
@@ -137,7 +137,7 @@ export default function FocusModal({ visible, onClose }: Props) {
     if (focusState === "focusing") {
       pause();
       setFocusState("confirmExit");
-    } else if (focusState === "break") {
+    } else if (focusState === "breaking") {
       reset();
       setFocusState("idle");
       setTimeout(() => onClose(), 50);
@@ -159,7 +159,7 @@ export default function FocusModal({ visible, onClose }: Props) {
   const onConfirmReward = async () => {
     if (autoStartBreak) {
       // 자동 휴식 케이스(현재는 false): 곧장 휴식 시작
-      setFocusState("break");
+      setFocusState("breaking");
       start(); // 휴식 카운트다운 시작
     } else {
       setFocusState("confirmBreak");
@@ -169,7 +169,7 @@ export default function FocusModal({ visible, onClose }: Props) {
   // 휴식 여부 모달 콜백
   const onBreakYes = () => {
     // ✅ 핵심: 모달을 닫지 말고, 휴식 상태로 전환 + 타이머 시작
-    setFocusState("break");
+    setFocusState("breaking");
     // usePomodoroTimer는 포커스 완료 직후 이미 phase를 "break"로 전환해둔다.
     // autoStartBreak=false라 자동 시작은 안 했으므로 여기서 수동으로 시작한다.
     start();
@@ -178,6 +178,7 @@ export default function FocusModal({ visible, onClose }: Props) {
     // 휴식 없이 홈 복귀
     reset();
     setFocusState("idle");
+    skip();
     setTimeout(() => onClose(), 50);
   };
 
@@ -187,7 +188,7 @@ export default function FocusModal({ visible, onClose }: Props) {
     focusState === "confirmBreak"
   );
 
-  const showExitButton = focusState === "focusing" || focusState === "break"; // ✅ 휴식 중에도 노출
+  const showExitButton = focusState === "focusing" || focusState === "breaking"; // ✅ 휴식 중에도 노출
 
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>
@@ -198,7 +199,7 @@ export default function FocusModal({ visible, onClose }: Props) {
             <VideoView player={successPlayer} style={styles.media} />
           ) : focusState === "focusing" || focusState === "confirmExit" ? (
             <VideoView player={focusPlayer} style={styles.media} />
-          ) : focusState === "break" ? (
+          ) : focusState === "breaking" ? (
             <VideoView player={idlePlayer} style={styles.media} />
           ) : (
             <VideoView player={idlePlayer} style={styles.media} />
@@ -218,7 +219,7 @@ export default function FocusModal({ visible, onClose }: Props) {
           accessibilityLabel="세션 종료"
         >
           <Text style={styles.exitText}>
-            {focusState === "break" ? "휴식 종료" : "종료"}
+            {focusState === "breaking" ? "휴식 종료" : "종료"}
           </Text>
         </TouchableOpacity>
       </View>
