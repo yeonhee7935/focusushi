@@ -1,3 +1,4 @@
+// screens/TimerScreen.tsx
 import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,6 +14,7 @@ import { recordAcquisition } from "../db";
 import { notifyFocusSuccess } from "../notifications";
 import type { Sushi } from "../types";
 import { palette } from "../theme";
+import FocusModal from "../components/FocusModal"; // ⭐️ [추가] 1단계 테스트 연결
 
 const IDLE_ASSET = require("../../assets/video/idle.mp4");
 const FOCUS_ASSET = require("../../assets/video/focus.mp4");
@@ -37,6 +39,9 @@ export default function TimerScreen() {
   const [rewardOpen, setRewardOpen] = useState(false);
   const [reward, setReward] = useState<Sushi | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // ⭐️ [추가] 1단계 테스트용 모달 상태
+  const [focusOpen, setFocusOpen] = useState(false);
 
   const isIdle = !isRunning && phase === "focus" && !showSuccess;
   const isFocusing = isRunning && phase === "focus" && !showSuccess;
@@ -117,6 +122,7 @@ export default function TimerScreen() {
   }, [pause, reset]);
 
   const closeReward = useCallback(() => setRewardOpen(false), []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.stack}>
@@ -176,6 +182,15 @@ export default function TimerScreen() {
             <Text style={styles.startText}>시작</Text>
           </TouchableOpacity>
         )}
+
+        {/* ⭐️ [추가] 1단계 테스트용: FocusModal 열기 버튼 */}
+        <TouchableOpacity
+          style={[styles.startBtn, { marginTop: 16 }]}
+          onPress={() => setFocusOpen(true)}
+          accessibilityLabel="(임시) 집중 모달 열기"
+        >
+          <Text style={styles.startText}>(임시) 집중 모달 열기</Text>
+        </TouchableOpacity>
       </View>
 
       <ConfirmExitModal
@@ -188,6 +203,9 @@ export default function TimerScreen() {
         sushi={reward}
         onConfirm={closeReward}
       />
+
+      {/* ⭐️ [추가] FocusModal 테스트 연결 */}
+      <FocusModal visible={focusOpen} onClose={() => setFocusOpen(false)} />
     </SafeAreaView>
   );
 }
