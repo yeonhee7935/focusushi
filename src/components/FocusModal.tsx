@@ -1,6 +1,13 @@
 // components/FocusModal.tsx
-import React, { useEffect, useState } from "react";
-import { Modal, View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Modal,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  AppState,
+} from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
 import * as Haptics from "expo-haptics";
@@ -14,6 +21,7 @@ import { recordAcquisition } from "../db";
 import { notifyFocusSuccess } from "../notifications";
 import type { Sushi } from "../types";
 import { palette } from "../theme";
+import { useFocusEffect } from "@react-navigation/native";
 
 const IDLE_ASSET = require("../../assets/video/idle.mp4");
 const FOCUS_ASSET = require("../../assets/video/focus.mp4");
@@ -41,8 +49,8 @@ export default function FocusModal({ visible, onClose }: Props) {
   const autoStartBreak = false;
 
   const { start, pause, reset, skip, mmss } = usePomodoroTimer({
-    focusSeconds: 3,
-    breakSeconds: 5,
+    focusSeconds: 30,
+    breakSeconds: 50,
     autoStartBreak, // false: 포커스 종료 후 휴식 자동시작 안 함(사용자 선택)
     onFocusComplete: async () => {
       // 포커스 종료 → 보상 플로우
@@ -185,6 +193,79 @@ export default function FocusModal({ visible, onClose }: Props) {
   const showTimer = focusState === "focusing" || focusState === "breaking";
 
   const showExitButton = focusState === "focusing" || focusState === "breaking"; // ✅ 휴식 중에도 노출
+
+  // ✅ 상태에 맞춰 모든 플레이어를 일괄 제어하는 유틸
+  const applyPlaybackByState = useCallback(() => {
+    // 모달이 닫혀 있으면 모두 정지
+    if (!visible) {
+      idlePlayer.pause();
+      focusPlayer.pause();
+      successPlayer.pause();
+      return;
+    }
+
+    if (focusState === "idle") {
+      idlePlayer.play();
+      focusPlayer.pause();
+      successPlayer.pause();
+    } else if (focusState === "focusing") {
+      focusPlayer.play();
+      idlePlayer.pause();
+      successPlayer.pause();
+    } else if (focusState === "successVideo") {
+      try {
+        successPlayer.currentTime = 0;
+      } catch {}
+      successPlayer.play();
+      idlePlayer.pause();
+      focusPlayer.pause();
+    } else if (focusState === "breaking") {
+      idlePlayer.play();
+      focusPlayer.pause();
+      successPlayer.pause();
+    } else if (
+      focusState === "confirmExit" ||
+      focusState === "reward" ||
+      focusState === "confirmBreak"
+    ) {
+      idlePlayer.pause();
+      focusPlayer.pause();
+      successPlayer.pause();
+    }
+  }, [visible, focusState, idlePlayer, focusPlayer, successPlayer]);
+
+  // ⬇️ 기존 상태별 영상 제어 effect는 유틸을 호출하도록 유지
+  useEffect(() => {
+    applyPlaybackByState();
+  }, [applyPlaybackByState]);
+
+  // ✅ 네비게이션 포커스 복귀 시 재생 보정
+  useFocusEffect(
+    useCallback(() => {
+      applyPlaybackByState(); // 화면에 돌아오면 현재 상태대로 재생
+      return () => {
+        // 다른 탭/화면으로 나갈 때 정지(자원 절약)
+        idlePlayer.pause();
+        focusPlayer.pause();
+        successPlayer.pause();
+      };
+    }, [applyPlaybackByState, idlePlayer, focusPlayer, successPlayer])
+  );
+
+  // ✅ 앱이 포그라운드로 돌아올 때 재생 보정
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (s) => {
+      if (s === "active") {
+        applyPlaybackByState();
+      } else {
+        // background/inactive로 가면 일단 정지
+        idlePlayer.pause();
+        focusPlayer.pause();
+        successPlayer.pause();
+      }
+    });
+    return () => sub.remove();
+  }, [applyPlaybackByState, idlePlayer, focusPlayer, successPlayer]);
 
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>

@@ -1,11 +1,18 @@
 // screens/TimerScreen.tsx
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  AppState,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useVideoPlayer, VideoView } from "expo-video";
 
 import FocusModal from "../components/FocusModal";
 import { palette } from "../theme";
+import { useFocusEffect } from "@react-navigation/native";
 
 const IDLE_ASSET = require("../../assets/video/idle.mp4");
 
@@ -28,6 +35,28 @@ export default function TimerScreen() {
     }
   }, [focusOpen, idlePlayer]);
 
+  // ✅ 화면 포커스 기준으로 재생/일시정지
+  useFocusEffect(
+    useCallback(() => {
+      if (!focusOpen) idlePlayer.play();
+      return () => {
+        // 다른 탭으로 이동(blur) 시 정지
+        idlePlayer.pause();
+      };
+    }, [focusOpen, idlePlayer])
+  );
+
+  // ✅ 앱 상태(백그라운드/포그라운드) 복귀 시 재생 보정
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        if (!focusOpen) idlePlayer.play();
+      } else {
+        idlePlayer.pause();
+      }
+    });
+    return () => sub.remove();
+  }, [focusOpen, idlePlayer]);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.stack}>

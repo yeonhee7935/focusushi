@@ -1,58 +1,68 @@
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import TimerScreen from "../screens/TimerScreen";
 import CollectionScreen from "../screens/CollectionScreen";
-import { palette } from "../theme";
 
-export type RootStackParamList = {
-  Splash: undefined;
-  Timer: undefined;
-  Collection: undefined;
-};
+const Tab = createBottomTabNavigator();
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const theme = {
+const navTheme = {
   ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: palette.bg },
+  colors: { ...DefaultTheme.colors, background: "#000" },
 };
 
 export default function AppNavigator() {
+  const insets = useSafeAreaInsets(); // ✅ 하단 안전 영역
+
   return (
-    <NavigationContainer theme={theme}>
-      <Stack.Navigator
-        initialRouteName="Timer"
-        screenOptions={{
-          headerStyle: { backgroundColor: palette.bg },
-          headerTitleStyle: { fontWeight: "800", color: "#FF5722" },
-          headerTintColor: "#6D4C41",
-        }}
+    <NavigationContainer theme={navTheme}>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarShowLabel: true,
+          tabBarActiveTintColor: "#fff",
+          tabBarInactiveTintColor: "#8b8b8b",
+          tabBarHideOnKeyboard: true, // ✅ 선택: 키보드 시 숨김
+          tabBarStyle: {
+            backgroundColor: "#111",
+            borderTopColor: "transparent",
+            // ✅ 안전 영역을 반영해 겹침 방지
+            height: 56 + insets.bottom,
+            paddingBottom: 8 + insets.bottom,
+            paddingTop: 8,
+          },
+          tabBarIcon: ({ color, size }) => {
+            const map: Record<string, keyof typeof Ionicons.glyphMap> = {
+              Timer: "timer-outline",
+              Collection: "albums-outline",
+              Stats: "bar-chart-outline",
+              Settings: "settings-outline",
+            };
+            return (
+              <Ionicons
+                name={map[route.name] ?? "ellipse"}
+                size={size}
+                color={color}
+              />
+            );
+          },
+        })}
       >
-        <Stack.Screen
+        <Tab.Screen
           name="Timer"
           component={TimerScreen}
-          options={({ navigation }) => ({
-            title: "집중",
-            headerRight: () => (
-              <TouchableOpacity
-                onPress={() => navigation.navigate("Collection")}
-                accessibilityLabel="도감 열기"
-                style={{ paddingHorizontal: 8, paddingVertical: 4 }}
-              >
-                <Text style={{ fontSize: 18 }}>🍣</Text>
-              </TouchableOpacity>
-            ),
-          })}
+          options={{ title: "집중" }}
         />
-        <Stack.Screen
+        <Tab.Screen
           name="Collection"
           component={CollectionScreen}
-          options={{ title: "도감" }}
+          options={{ title: "컬렉션" }}
         />
-      </Stack.Navigator>
+        {/* 필요 시 추가 탭 */}
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
