@@ -8,6 +8,7 @@ import * as Haptics from "expo-haptics";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import ConfirmExitModal from "./../components/ConfirmExitModal";
 import RewardModal from "./../components/RewardModal";
+import ConfirmBreakModal from "./../components/ConfirmBreakModal";
 import { rollSushi } from "../data/gacha";
 import { recordAcquisition } from "../db";
 import { notifyFocusSuccess } from "../notifications";
@@ -23,7 +24,9 @@ type FocusSessionState =
   | "focusing"
   | "successVideo"
   | "reward"
-  | "confirmExit";
+  | "confirmExit"
+  | "confirmBreak"
+  | "break"; // 🆕 휴식 상태 추가
 
 type Props = {
   visible: boolean;
@@ -34,27 +37,31 @@ export default function FocusModal({ visible, onClose }: Props) {
   const [focusState, setFocusState] = useState<FocusSessionState>("idle");
   const [rewardSushi, setRewardSushi] = useState<Sushi | null>(null);
 
+  // 현재 단계에선 자동휴식 off 가정 (MVP)
+  const autoStartBreak = false;
+
   const { start, pause, reset, mmss } = usePomodoroTimer({
-    focusSeconds: 10,
-    breakSeconds: 10,
-    autoStartBreak: false,
+    focusSeconds: 3,
+    breakSeconds: 3,
+    autoStartBreak, // false: 포커스 종료 후 휴식 자동시작 안 함(사용자 선택)
     onFocusComplete: async () => {
-      // 1) 보상 추첨 및 저장/알림
+      // 포커스 종료 → 보상 플로우
       const got = rollSushi();
       setRewardSushi(got);
       recordAcquisition(got.id).catch(() => {});
       notifyFocusSuccess(`보상: ${got.name}`);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-      // 2) 성공 영상으로 전환
       setFocusState("successVideo");
     },
     onBreakComplete: () => {
-      // 다음 단계에서 break 플로우 연결
+      // 휴식 완료 → 홈 복귀
+      reset();
+      setFocusState("idle");
+      setTimeout(() => onClose(), 50);
     },
   });
 
-  // 영상 플레이어 3종
+  // 플레이어
   const idlePlayer = useVideoPlayer(IDLE_ASSET, (p) => {
     p.loop = true;
     p.muted = true;
@@ -68,10 +75,8 @@ export default function FocusModal({ visible, onClose }: Props) {
     p.muted = true;
   });
 
-  // 성공/종료 감지
+  // 성공 영상 종료 감지 → reward로
   const successPlayingEvt = useEvent(successPlayer, "playingChange");
-
-  // 성공 영상 끝나면 → 리워드 모달로
   useEffect(() => {
     if (
       focusState === "successVideo" &&
@@ -98,15 +103,24 @@ export default function FocusModal({ visible, onClose }: Props) {
       successPlayer.play();
       idlePlayer.pause();
       focusPlayer.pause();
-    } else if (focusState === "confirmExit" || focusState === "reward") {
-      // 모달/보상 표시 중에는 영상 정지
+    } else if (focusState === "break") {
+      // 휴식 중엔 잔잔한 idle 영상을 사용
+      idlePlayer.play();
+      focusPlayer.pause();
+      successPlayer.pause();
+    } else if (
+      focusState === "confirmExit" ||
+      focusState === "reward" ||
+      focusState === "confirmBreak"
+    ) {
+      // 모달류가 열릴 때는 모두 정지
       idlePlayer.pause();
       focusPlayer.pause();
       successPlayer.pause();
     }
   }, [focusState, idlePlayer, focusPlayer, successPlayer]);
 
-  // 모달 열림/닫힘에 따른 타이머 제어
+  // 모달 열림/닫힘
   useEffect(() => {
     if (visible) {
       setFocusState("focusing");
@@ -118,35 +132,62 @@ export default function FocusModal({ visible, onClose }: Props) {
     }
   }, [visible]);
 
-  // 종료 버튼 → 컨펌 모달
+  // 종료 버튼
   const onPressExit = () => {
     if (focusState === "focusing") {
       pause();
       setFocusState("confirmExit");
+    } else if (focusState === "break") {
+      reset();
+      setFocusState("idle");
+      setTimeout(() => onClose(), 50);
     }
   };
 
-  // ConfirmExitModal 콜백
+  // 종료 컨펌
   const keepFocusing = () => {
     setFocusState("focusing");
     start();
   };
-
   const confirmExit = () => {
     reset();
     setFocusState("idle");
-    // 모달 닫기(레이스 방지용 살짝 지연 가능)
     setTimeout(() => onClose(), 50);
   };
 
-  // RewardModal 확인 → 이번 단계에서는 홈으로 복귀
+  // 리워드 확인 → 조건부 휴식 모달
   const onConfirmReward = async () => {
+    if (autoStartBreak) {
+      // 자동 휴식 케이스(현재는 false): 곧장 휴식 시작
+      setFocusState("break");
+      start(); // 휴식 카운트다운 시작
+    } else {
+      setFocusState("confirmBreak");
+    }
+  };
+
+  // 휴식 여부 모달 콜백
+  const onBreakYes = () => {
+    // ✅ 핵심: 모달을 닫지 말고, 휴식 상태로 전환 + 타이머 시작
+    setFocusState("break");
+    // usePomodoroTimer는 포커스 완료 직후 이미 phase를 "break"로 전환해둔다.
+    // autoStartBreak=false라 자동 시작은 안 했으므로 여기서 수동으로 시작한다.
+    start();
+  };
+  const onBreakNo = () => {
+    // 휴식 없이 홈 복귀
     reset();
-    setRewardSushi(null);
     setFocusState("idle");
     setTimeout(() => onClose(), 50);
-    // ▶ 다음 단계(5)에서: autoStartBreak 체크 → confirmBreak로 전환 예정
   };
+
+  const showTimer = !(
+    focusState === "successVideo" ||
+    focusState === "reward" ||
+    focusState === "confirmBreak"
+  );
+
+  const showExitButton = focusState === "focusing" || focusState === "break"; // ✅ 휴식 중에도 노출
 
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>
@@ -157,30 +198,28 @@ export default function FocusModal({ visible, onClose }: Props) {
             <VideoView player={successPlayer} style={styles.media} />
           ) : focusState === "focusing" || focusState === "confirmExit" ? (
             <VideoView player={focusPlayer} style={styles.media} />
+          ) : focusState === "break" ? (
+            <VideoView player={idlePlayer} style={styles.media} />
           ) : (
             <VideoView player={idlePlayer} style={styles.media} />
           )}
         </View>
 
-        {/* 타이머: 성공/리워드 상태에서는 숨김(자리 유지) */}
-        <Text
-          style={[
-            styles.timeText,
-            (focusState === "successVideo" || focusState === "reward") &&
-              styles.hidden,
-          ]}
-        >
+        {/* 타이머: 성공/리워드/컨펌브레이크 상태에서는 숨김, 휴식 중엔 표시 */}
+        <Text style={[styles.timeText, !showTimer && styles.hidden]}>
           {mmss()}
         </Text>
 
-        {/* 종료 버튼: focusing에만 노출, success/reward/confirmExit에서는 숨김(자리 유지) */}
+        {/* 종료 버튼: focusing에만 활성 (휴식 중엔 기본적으로 숨김) */}
         <TouchableOpacity
           onPress={onPressExit}
-          disabled={focusState !== "focusing"}
-          style={[styles.exitBtn, focusState !== "focusing" && styles.hidden]}
+          disabled={!showExitButton}
+          style={[styles.exitBtn, !showExitButton && styles.hidden]}
           accessibilityLabel="세션 종료"
         >
-          <Text style={styles.exitText}>종료</Text>
+          <Text style={styles.exitText}>
+            {focusState === "break" ? "휴식 종료" : "종료"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -196,6 +235,13 @@ export default function FocusModal({ visible, onClose }: Props) {
         visible={focusState === "reward"}
         sushi={rewardSushi}
         onConfirm={onConfirmReward}
+      />
+
+      {/* 휴식 여부 모달 */}
+      <ConfirmBreakModal
+        visible={focusState === "confirmBreak"}
+        onYes={onBreakYes}
+        onNo={onBreakNo}
       />
     </Modal>
   );
@@ -231,7 +277,5 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   exitText: { color: "#fff", fontWeight: "900", fontSize: 16 },
-  hidden: {
-    opacity: 0, // 공간 유지
-  },
+  hidden: { opacity: 0 },
 });
