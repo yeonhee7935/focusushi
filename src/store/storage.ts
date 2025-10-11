@@ -8,15 +8,37 @@ export const STORAGE_KEYS = {
   SNAPSHOT: "snapshot",
 } as const;
 
-export async function load<T>(key: string, fallback: T): Promise<T> {
+const encode = (v: unknown) => JSON.stringify(v);
+const decode = <T>(raw: string | null, fallback: T): T => {
+  if (!raw) return fallback;
   try {
-    const v = await AsyncStorage.getItem(key);
-    return v ? (JSON.parse(v) as T) : fallback;
+    return JSON.parse(raw) as T;
   } catch {
     return fallback;
   }
+};
+
+export async function load<T>(key: string, fallback: T): Promise<T> {
+  const raw = await AsyncStorage.getItem(key);
+  return decode<T>(raw, fallback);
 }
 
 export async function save<T>(key: string, value: T): Promise<void> {
-  await AsyncStorage.setItem(key, JSON.stringify(value));
+  await AsyncStorage.setItem(key, encode(value));
+}
+
+export async function update<T>(key: string, updater: (prev: T | undefined) => T): Promise<T> {
+  const raw = await AsyncStorage.getItem(key);
+  const prev = raw ? (JSON.parse(raw) as T) : undefined;
+  const next = updater(prev);
+  await AsyncStorage.setItem(key, encode(next));
+  return next;
+}
+
+export async function remove(key: string): Promise<void> {
+  await AsyncStorage.removeItem(key);
+}
+
+export async function exists(key: string): Promise<boolean> {
+  return (await AsyncStorage.getItem(key)) !== null;
 }
