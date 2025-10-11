@@ -1,60 +1,39 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useSnapshotPersistence } from "../hooks/useSnapshot";
 import { formatMMSS } from "../utils/time";
-import { useRootNav } from "@/navigation/hooks";
+import { useRootNav } from "../navigation/hooks";
+import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 
 export default function FocusSessionScreen() {
   const nav = useRootNav();
   const { current, completeSession, endCourse } = useCourse();
+
   const focusMs = current?.focusMs ?? 0;
 
-  const [remaining, setRemaining] = useState(focusMs);
-  const [paused, setPaused] = useState(false);
-  const tickRef = useRef<number | null>(null);
+  const onComplete = useCallback(() => {
+    completeSession().then(() => {
+      nav.navigate("RewardModal");
+    });
+  }, [completeSession, nav]);
+
+  const timer = usePomodoroTimer(focusMs, onComplete);
 
   useEffect(() => {
-    if (!current) return;
-    setRemaining(focusMs);
-  }, [current, focusMs]);
-
-  useEffect(() => {
-    if (!current) return;
-    if (paused) {
-      if (tickRef.current) clearInterval(tickRef.current);
-      return;
-    }
-    tickRef.current && clearInterval(tickRef.current);
-    tickRef.current = setInterval(() => {
-      setRemaining((ms) => Math.max(0, ms - 1000));
-    }, 1000);
-    return () => {
-      tickRef.current && clearInterval(tickRef.current);
-    };
-  }, [paused, current]);
-
-  useEffect(() => {
-    if (!current) return;
-    if (remaining === 0) {
-      tickRef.current && clearInterval(tickRef.current);
-      completeSession().then(() => {
-        nav.navigate("RewardModal");
-      });
-    }
-  }, [remaining, current, completeSession, nav]);
+    if (current) timer.start(focusMs);
+  }, [current, focusMs, timer.start]);
 
   useSnapshotPersistence(
     useCallback(() => {
       if (!current) return undefined;
       return {
         mode: "FOCUS",
-        remainingMs: remaining,
+        remainingMs: timer.remaining,
         courseId: current.id,
         savedAt: Date.now(),
       };
-    }, [current, remaining]),
+    }, [current, timer.remaining]),
   );
 
   const onEnd = useCallback(() => {
@@ -65,19 +44,19 @@ export default function FocusSessionScreen() {
         text: "종료",
         style: "destructive",
         onPress: async () => {
-          tickRef.current && clearInterval(tickRef.current);
+          timer.stop();
           await endCourse();
           nav.replace("CourseSummary");
         },
       },
     ]);
-  }, [current, endCourse, nav]);
+  }, [current, endCourse, nav, timer]);
 
   if (!current) {
     return (
       <View style={s.center}>
         <Text style={s.title}>진행 중인 코스가 없습니다</Text>
-        <Pressable style={s.cta} onPress={() => nav.goBack()}>
+        <Pressable style={s.cta} onPress={() => nav.navigate("Tabs")}>
           <Text style={s.ctaText}>돌아가기</Text>
         </Pressable>
       </View>
@@ -90,16 +69,17 @@ export default function FocusSessionScreen() {
         <Text style={s.badge}>
           {current.completedSessions}/{current.plannedSessions}
         </Text>
-        <Text style={s.timer}>{formatMMSS(remaining)}</Text>
+        <Text style={s.timer}>{formatMMSS(timer.remaining)}</Text>
         <View style={s.row}>
-          <Pressable
-            style={[s.btn, paused ? s.primary : s.secondary]}
-            onPress={() => setPaused(!paused)}
-          >
-            <Text style={paused ? s.btnTextPrimary : s.btnTextSecondary}>
-              {paused ? "재개" : "일시정지"}
-            </Text>
-          </Pressable>
+          {timer.paused ? (
+            <Pressable style={[s.btn, s.primary]} onPress={timer.resume}>
+              <Text style={s.btnTextPrimary}>재개</Text>
+            </Pressable>
+          ) : (
+            <Pressable style={[s.btn, s.secondary]} onPress={timer.pause}>
+              <Text style={s.btnTextSecondary}>일시정지</Text>
+            </Pressable>
+          )}
           <Pressable style={[s.btn, s.danger]} onPress={onEnd}>
             <Text style={s.btnTextDanger}>코스 종료</Text>
           </Pressable>
