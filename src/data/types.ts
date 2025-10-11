@@ -1,10 +1,4 @@
-export type Rarity =
-  | "COMMON"
-  | "UNCOMMON"
-  | "RARE"
-  | "EPIC"
-  | "LEGENDARY"
-  | "ULTRA_RARE";
+export type Rarity = "COMMON" | "UNCOMMON" | "RARE" | "EPIC" | "LEGENDARY" | "ULTRA_RARE";
 
 export type FoodCategory = "SUSHI" | "DESSERT" | "APPETIZER";
 
