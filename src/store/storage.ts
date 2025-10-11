@@ -27,11 +27,22 @@ export async function save<T>(key: string, value: T): Promise<void> {
   await AsyncStorage.setItem(key, encode(value));
 }
 
-export async function update<T>(key: string, updater: (prev: T | undefined) => T): Promise<T> {
+export async function setOrRemove<T>(key: string, value: T | undefined | null): Promise<void> {
+  if (value === undefined || value === null) {
+    await AsyncStorage.removeItem(key);
+  } else {
+    await AsyncStorage.setItem(key, encode(value));
+  }
+}
+
+export async function update<T>(
+  key: string,
+  updater: (prev: T | undefined) => T | undefined | null,
+): Promise<T | undefined | null> {
   const raw = await AsyncStorage.getItem(key);
   const prev = raw ? (JSON.parse(raw) as T) : undefined;
   const next = updater(prev);
-  await AsyncStorage.setItem(key, encode(next));
+  await setOrRemove<T>(key, next as T | undefined | null);
   return next;
 }
 

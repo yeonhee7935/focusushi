@@ -4,9 +4,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useSnapshotPersistence } from "../hooks/useSnapshot";
 import { formatMMSS } from "../utils/time";
+import { useRootNav } from "@/navigation/hooks";
 
 export default function FocusSessionScreen() {
-  const nav = useNavigation();
+  const nav = useRootNav();
   const { current, completeSession, endCourse } = useCourse();
   const focusMs = current?.focusMs ?? 0;
 
@@ -39,7 +40,6 @@ export default function FocusSessionScreen() {
     if (remaining === 0) {
       tickRef.current && clearInterval(tickRef.current);
       completeSession().then(() => {
-        // @ts-expect-error generic nav
         nav.navigate("RewardModal");
       });
     }
@@ -67,8 +67,7 @@ export default function FocusSessionScreen() {
         onPress: async () => {
           tickRef.current && clearInterval(tickRef.current);
           await endCourse();
-          // @ts-expect-error generic nav
-          nav.navigate("CourseSummary");
+          nav.replace("CourseSummary");
         },
       },
     ]);

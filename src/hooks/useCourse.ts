@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { STORAGE_KEYS, load, save } from "../store/storage";
+import { STORAGE_KEYS, load, save, setOrRemove } from "../store/storage";
 import { Course, CourseItem } from "../data/types";
 
 interface CourseState {
@@ -58,7 +58,7 @@ export const useCourse = create<CourseState>((set, get) => ({
     if (!current) return;
     const history = [...get().history, current];
     await save(STORAGE_KEYS.COURSE_HISTORY, history);
-    await save(STORAGE_KEYS.CURRENT_COURSE, undefined);
+    await setOrRemove<Course>(STORAGE_KEYS.CURRENT_COURSE, undefined);
     set({ current: undefined, history });
   },
 }));

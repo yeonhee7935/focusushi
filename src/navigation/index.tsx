@@ -46,7 +46,13 @@ export default function NavigationRoot() {
         <RootStack.Screen
           name="CourseSummary"
           component={CourseSummaryScreen}
-          options={{ presentation: "modal" }}
+          options={{
+            headerShown: false,
+            presentation: "fullScreenModal",
+            animation: "fade",
+            animationTypeForReplace: "push",
+            contentStyle: { backgroundColor: "#fff" },
+          }}
         />
       </RootStack.Navigator>
     </NavigationContainer>
