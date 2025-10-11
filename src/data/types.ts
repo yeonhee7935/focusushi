@@ -27,13 +27,11 @@ export interface CourseItem {
   itemId: string;
   acquiredAt: number;
 }
-
 export interface Course {
   id: string;
   startedAt: number;
   plannedSessions: number;
   completedSessions: number;
-  category: FoodCategory;
   focusMs: number;
   breakMs: number;
   items: CourseItem[];

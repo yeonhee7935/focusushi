@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { STORAGE_KEYS, load, save } from "../store/storage";
-import { Course, CourseItem, FoodCategory } from "../data/types";
+import { Course, CourseItem } from "../data/types";
 
 interface CourseState {
   current?: Course;
@@ -8,7 +8,6 @@ interface CourseState {
   loaded: boolean;
   createCourse: (params: {
     plannedSessions: number;
-    category: FoodCategory;
     focusMs: number;
     breakMs: number;
   }) => Promise<void>;
@@ -28,13 +27,12 @@ export const useCourse = create<CourseState>((set, get) => ({
     set({ current, history, loaded: true });
   },
 
-  createCourse: async ({ plannedSessions, category, focusMs, breakMs }) => {
+  createCourse: async ({ plannedSessions, focusMs, breakMs }) => {
     const newCourse: Course = {
       id: String(Date.now()),
       startedAt: Date.now(),
       plannedSessions,
       completedSessions: 0,
-      category,
       focusMs,
       breakMs,
       items: [],

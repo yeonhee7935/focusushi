@@ -1,4 +1,4 @@
-import type { FoodItem, Rarity, FoodCategory } from "../data/types";
+import type { FoodItem, Rarity } from "../data/types";
 
 export const RARITY_WEIGHTS: Record<Rarity, number> = {
   COMMON: 70,
@@ -10,7 +10,6 @@ export const RARITY_WEIGHTS: Record<Rarity, number> = {
 };
 
 export interface GachaInput {
-  category: FoodCategory;
   pool: FoodItem[];
 }
 
@@ -20,6 +19,5 @@ export interface GachaResult {
 }
 
 export function rollGacha(_input: GachaInput): GachaResult {
-  // 구현은 7단계에서
   throw new Error("Not implemented yet");
 }
