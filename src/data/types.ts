@@ -7,13 +7,13 @@ export interface FoodItem {
   name: string;
   category: FoodCategory;
   rarity: Rarity;
-  image: string; // local asset path or require key
+  image: string;
   description?: string;
 }
 
 export interface AcquisitionLog {
   itemId: string;
-  acquiredAt: number; // epoch ms
+  acquiredAt: number;
 }
 
 export interface AppSettings {
@@ -36,5 +36,5 @@ export interface Course {
   category: FoodCategory;
   focusMs: number;
   breakMs: number;
-  items: CourseItem[]; // 보상 내역(코스 맥락)
+  items: CourseItem[];
 }
