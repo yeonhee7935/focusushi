@@ -72,6 +72,16 @@ export default function RewardModal() {
           <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
             <Text style={s.btnTextSecondary}>코스 종료</Text>
           </Pressable>
+
+          <Pressable style={[s.btn, s.primary]} onPress={onNext}>
+            <Text style={s.btnTextPrimary}>다음 세션</Text>
+          </Pressable>
+          <Pressable style={[s.btn, s.secondary]} onPress={() => nav.navigate("BreakSheet")}>
+            <Text style={s.btnTextSecondary}>휴식하기</Text>
+          </Pressable>
+          <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
+            <Text style={s.btnTextSecondary}>코스 종료</Text>
+          </Pressable>
         </View>
       </View>
     </View>

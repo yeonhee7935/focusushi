@@ -9,6 +9,7 @@ import CourseSetupScreen from "../screens/CourseSetupScreen";
 import RewardModal from "../screens/RewardModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
 import type { RootStackParamList, TabParamList } from "./types";
+import BreakSheet from "@/screens/BreakSheet";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -53,6 +54,11 @@ export default function NavigationRoot() {
             animationTypeForReplace: "push",
             contentStyle: { backgroundColor: "#fff" },
           }}
+        />
+        <RootStack.Screen
+          name="BreakSheet"
+          component={BreakSheet}
+          options={{ presentation: "transparentModal", headerShown: false }}
         />
       </RootStack.Navigator>
     </NavigationContainer>
