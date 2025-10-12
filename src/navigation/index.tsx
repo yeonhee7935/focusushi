@@ -10,6 +10,7 @@ import RewardModal from "../screens/RewardModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
 import type { RootStackParamList, TabParamList } from "./types";
 import BreakSheet from "@/screens/BreakSheet";
+import ItemDetailModal from "@/screens/ItemDetailModal";
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -58,6 +59,11 @@ export default function NavigationRoot() {
         <RootStack.Screen
           name="BreakSheet"
           component={BreakSheet}
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <RootStack.Screen
+          name="ItemDetail"
+          component={ItemDetailModal}
           options={{ presentation: "transparentModal", headerShown: false }}
         />
       </RootStack.Navigator>

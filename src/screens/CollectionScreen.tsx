@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { FOODS } from "../data/foods";
 import { useAcquisition } from "../hooks/useAcquisition";
 import type { FoodItem } from "../data/types";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRootNav } from "../navigation/hooks";
 
 export default function CollectionScreen() {
   const logs = useAcquisition((s) => s.logs);
+  const nav = useRootNav();
 
   const ownedSet = useMemo(() => {
     const s = new Set<string>();
@@ -19,7 +21,11 @@ export default function CollectionScreen() {
   const renderItem = ({ item }: { item: FoodItem }) => {
     const owned = ownedSet.has(item.id);
     return (
-      <Pressable style={s.card} accessibilityRole="button">
+      <Pressable
+        style={s.card}
+        accessibilityRole="button"
+        onPress={() => nav.navigate("ItemDetail", { itemId: item.id })}
+      >
         <View style={s.thumb} />
         <Text style={s.name} numberOfLines={1}>
           {item.name}

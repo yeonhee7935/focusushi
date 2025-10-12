@@ -11,4 +11,5 @@ export type RootStackParamList = {
   RewardModal: { itemId?: string } | undefined;
   CourseSummary: { courseId?: string } | undefined;
   BreakSheet: undefined;
+  ItemDetail: { itemId: string };
 };
