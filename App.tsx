@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useSettingsInit } from "./src/hooks/useSettings";
 import { useCourse } from "./src/hooks/useCourse";
 import { useAcquisition } from "./src/hooks/useAcquisition";
+import { initNotifications } from "./src/lib/notifications";
 
 export default function App() {
   useSettingsInit();
@@ -14,6 +15,7 @@ export default function App() {
   useEffect(() => {
     loadCourses();
     loadLogs();
+    initNotifications();
   }, [loadCourses, loadLogs]);
 
   return (

@@ -1,28 +1,54 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import { useCourse } from "../hooks/useCourse";
 import { useSnapshotPersistence } from "../hooks/useSnapshot";
 import { formatMMSS } from "../utils/time";
 import { useRootNav } from "../navigation/hooks";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
+import { cancelNotification, scheduleLocal } from "../lib/notifications";
 
 export default function FocusSessionScreen() {
   const nav = useRootNav();
-  const { current, completeSession, endCourse } = useCourse();
+  const { current, endCourse } = useCourse();
 
   const focusMs = current?.focusMs ?? 0;
+  const notifIdRef = useRef<string | null>(null);
 
   const onComplete = useCallback(() => {
-    completeSession().then(() => {
-      nav.navigate("RewardModal");
-    });
-  }, [completeSession, nav]);
+    if (notifIdRef.current) {
+      cancelNotification(notifIdRef.current);
+      notifIdRef.current = null;
+    }
+    nav.navigate("RewardModal");
+  }, [nav]);
 
   const timer = usePomodoroTimer(focusMs, onComplete);
 
   useEffect(() => {
-    if (current) timer.start(focusMs);
-  }, [current, focusMs, timer.start]);
+    if (!current || focusMs <= 0) return;
+    timer.start(focusMs);
+  }, [current?.id, focusMs]); // start 한 번만
+
+  useEffect(() => {
+    // running이면 남은 시간으로 예약, 일시정지/정지면 취소
+    (async () => {
+      if (timer.running && !timer.paused) {
+        if (notifIdRef.current) {
+          await cancelNotification(notifIdRef.current);
+        }
+        notifIdRef.current = await scheduleLocal(
+          timer.remaining,
+          "집중 시간이 끝났어요",
+          "보상을 받아볼까요?",
+        );
+      } else {
+        if (notifIdRef.current) {
+          await cancelNotification(notifIdRef.current);
+          notifIdRef.current = null;
+        }
+      }
+    })();
+  }, [timer.running, timer.paused, timer.remaining]);
 
   useSnapshotPersistence(
     useCallback(() => {
@@ -45,6 +71,10 @@ export default function FocusSessionScreen() {
         style: "destructive",
         onPress: async () => {
           timer.stop();
+          if (notifIdRef.current) {
+            await cancelNotification(notifIdRef.current);
+            notifIdRef.current = null;
+          }
           await endCourse();
           nav.replace("CourseSummary");
         },
