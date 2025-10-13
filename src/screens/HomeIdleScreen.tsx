@@ -1,13 +1,11 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../navigation/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
+import { useRootNav } from "@/navigation/hooks";
 
 export default function HomeIdleScreen() {
-  const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const nav = useRootNav();
 
   const onStart = useCallback(() => {
     nav.navigate("CourseSetup");

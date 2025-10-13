@@ -1,4 +1,3 @@
-// src/navigation/index.tsx
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Tabs from "./Tabs";
@@ -7,17 +6,10 @@ import BreakSheet from "../screens/BreakSheet";
 import RewardModal from "../screens/RewardModal";
 import ItemDetailModal from "../screens/ItemDetailModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
+import CourseSetupScreen from "../screens/CourseSetupScreen";
 import { navTheme } from "../theme/navTheme";
 import { colors } from "../theme/colors";
-
-export type RootStackParamList = {
-  Tabs: undefined;
-  FocusSession: undefined;
-  BreakSheet: undefined;
-  RewardModal: undefined;
-  ItemDetail: { itemId: string };
-  CourseSummary: undefined;
-};
+import type { RootStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -38,7 +30,12 @@ export default function RootNavigator() {
         <Stack.Screen
           name="FocusSession"
           component={FocusSessionScreen}
-          options={{ title: "집중" }}
+          options={{ presentation: "fullScreenModal", title: "집중" }}
+        />
+        <Stack.Screen
+          name="CourseSetup"
+          component={CourseSetupScreen}
+          options={{ presentation: "transparentModal", headerShown: false }}
         />
         <Stack.Screen
           name="CourseSummary"
@@ -48,17 +45,12 @@ export default function RootNavigator() {
         <Stack.Screen
           name="ItemDetail"
           component={ItemDetailModal}
-          options={{
-            title: "상세",
-            presentation: "modal",
-            animation: "slide_from_bottom",
-          }}
+          options={{ title: "상세", presentation: "modal", animation: "slide_from_bottom" }}
         />
         <Stack.Screen
           name="BreakSheet"
           component={BreakSheet}
           options={{
-            title: "휴식",
             presentation: "transparentModal",
             animation: "fade_from_bottom",
             headerShown: false,
@@ -68,7 +60,6 @@ export default function RootNavigator() {
           name="RewardModal"
           component={RewardModal}
           options={{
-            title: "보상",
             presentation: "transparentModal",
             animation: "fade_from_bottom",
             headerShown: false,
