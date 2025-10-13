@@ -6,6 +6,7 @@ import { useSettingsInit } from "./src/hooks/useSettings";
 import { useCourse } from "./src/hooks/useCourse";
 import { useAcquisition } from "./src/hooks/useAcquisition";
 import { initNotifications } from "./src/lib/notifications";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   useSettingsInit();
@@ -19,9 +20,9 @@ export default function App() {
   }, [loadCourses, loadLogs]);
 
   return (
-    <>
+    <SafeAreaProvider>
       <NavigationRoot />
       <StatusBar style="auto" />
-    </>
+    </SafeAreaProvider>
   );
 }

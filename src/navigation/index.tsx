@@ -1,72 +1,80 @@
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+// src/navigation/index.tsx
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeIdleScreen from "../screens/HomeIdleScreen";
-import CollectionScreen from "../screens/CollectionScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import Tabs from "./Tabs";
 import FocusSessionScreen from "../screens/FocusSessionScreen";
-import CourseSetupScreen from "../screens/CourseSetupScreen";
+import BreakSheet from "../screens/BreakSheet";
 import RewardModal from "../screens/RewardModal";
+import ItemDetailModal from "../screens/ItemDetailModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
-import type { RootStackParamList, TabParamList } from "./types";
-import BreakSheet from "@/screens/BreakSheet";
-import ItemDetailModal from "@/screens/ItemDetailModal";
+import { navTheme } from "../theme/navTheme";
+import { colors } from "../theme/colors";
 
-const Tab = createBottomTabNavigator<TabParamList>();
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+export type RootStackParamList = {
+  Tabs: undefined;
+  FocusSession: undefined;
+  BreakSheet: undefined;
+  RewardModal: undefined;
+  ItemDetail: { itemId: string };
+  CourseSummary: undefined;
+};
 
-function Tabs() {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export default function RootNavigator() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Home" component={HomeIdleScreen} />
-      <Tab.Screen name="Collection" component={CollectionScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
-  );
-}
-
-export default function NavigationRoot() {
-  return (
-    <NavigationContainer theme={DefaultTheme}>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="Tabs" component={Tabs} />
-        <RootStack.Screen
+    <NavigationContainer theme={navTheme}>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: "#fff" },
+          headerShadowVisible: true,
+          headerTitleStyle: { color: colors.ink, fontWeight: "800", fontSize: 18 },
+          headerTintColor: colors.ink,
+          contentStyle: { backgroundColor: colors.surface },
+          animation: "fade",
+        }}
+      >
+        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+        <Stack.Screen
           name="FocusSession"
           component={FocusSessionScreen}
-          options={{ presentation: "fullScreenModal" }}
+          options={{ title: "집중" }}
         />
-        <RootStack.Screen
-          name="CourseSetup"
-          component={CourseSetupScreen}
-          options={{ presentation: "transparentModal" }}
-        />
-        <RootStack.Screen
-          name="RewardModal"
-          component={RewardModal}
-          options={{ presentation: "transparentModal" }}
-        />
-        <RootStack.Screen
+        <Stack.Screen
           name="CourseSummary"
           component={CourseSummaryScreen}
-          options={{
-            headerShown: false,
-            presentation: "fullScreenModal",
-            animation: "fade",
-            animationTypeForReplace: "push",
-            contentStyle: { backgroundColor: "#fff" },
-          }}
+          options={{ title: "오늘의 기록" }}
         />
-        <RootStack.Screen
-          name="BreakSheet"
-          component={BreakSheet}
-          options={{ presentation: "transparentModal", headerShown: false }}
-        />
-        <RootStack.Screen
+        <Stack.Screen
           name="ItemDetail"
           component={ItemDetailModal}
-          options={{ presentation: "transparentModal", headerShown: false }}
+          options={{
+            title: "상세",
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
         />
-      </RootStack.Navigator>
+        <Stack.Screen
+          name="BreakSheet"
+          component={BreakSheet}
+          options={{
+            title: "휴식",
+            presentation: "transparentModal",
+            animation: "fade_from_bottom",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="RewardModal"
+          component={RewardModal}
+          options={{
+            title: "보상",
+            presentation: "transparentModal",
+            animation: "fade_from_bottom",
+            headerShown: false,
+          }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
