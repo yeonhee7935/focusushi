@@ -27,23 +27,8 @@ export default function FocusSessionScreen() {
   const timer = usePomodoroTimer(focusMs, onComplete);
 
   useEffect(() => {
-    if (!current) return;
-    if (current.completedSessions >= current.plannedSessions) {
-      timer.stop();
-      if (notifIdRef.current) cancelNotification(notifIdRef.current);
-      nav.replace("CourseSummary");
-    }
-  }, [current?.completedSessions, current?.plannedSessions, nav, timer]);
-
-  useEffect(() => {
     const onFocus = () => {
       if (!current) return;
-      if (current.completedSessions >= current.plannedSessions) {
-        timer.stop();
-        if (notifIdRef.current) cancelNotification(notifIdRef.current);
-        nav.replace("CourseSummary");
-        return;
-      }
       if (focusMs > 0) {
         timer.stop();
         timer.start(focusMs);
@@ -51,7 +36,7 @@ export default function FocusSessionScreen() {
     };
     const unsub = nav.addListener?.("focus", onFocus);
     return () => unsub?.();
-  }, [nav, current?.id, current?.completedSessions, current?.plannedSessions, focusMs, timer, nav]);
+  }, [nav, current?.id, focusMs, timer]);
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+// src/screens/RewardModal.tsx
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useAcquisition } from "../hooks/useAcquisition";
 import { useCourse } from "../hooks/useCourse";
@@ -12,11 +13,14 @@ export default function RewardModal() {
   const nav = useRootNav();
   const addLog = useAcquisition((s) => s.addLog);
   const { current, completeSession, endCourse } = useCourse();
+
   const [reward, setReward] = useState<FoodItem | null>(null);
   const [empty, setEmpty] = useState(false);
+  const [willFinish, setWillFinish] = useState(false);
+  const endingRef = useRef(false);
 
   const pool = useMemo(() => FOODS, []);
-  const finished = current ? current.completedSessions >= current.plannedSessions : false;
+
   useEffect(() => {
     if (!current || reward || empty) return;
     const res = drawReward(pool);
@@ -27,20 +31,34 @@ export default function RewardModal() {
     setReward(res.item);
     const acquiredAt = Date.now();
     addLog(res.item);
+    const nextWillFinish = current.completedSessions + 1 >= current.plannedSessions;
+    setWillFinish(nextWillFinish);
     completeSession({ itemId: res.item.id, acquiredAt });
   }, [current, reward, empty, pool, addLog, completeSession]);
 
+  const finishedFromStore = current ? current.completedSessions >= current.plannedSessions : false;
+  const finishedUI = willFinish || finishedFromStore;
+
   const onNext = useCallback(async () => {
     if (!current) return;
-    if (finished) {
+    if (finishedUI) {
+      if (endingRef.current) return;
+      endingRef.current = true;
       await endCourse();
       nav.replace("CourseSummary");
       return;
     }
     nav.goBack();
-  }, [current, endCourse, nav]);
+  }, [current, finishedUI, endCourse, nav]);
+
+  const onBreak = useCallback(() => {
+    if (finishedUI) return;
+    nav.navigate("BreakSheet");
+  }, [finishedUI, nav]);
 
   const onEnd = useCallback(async () => {
+    if (endingRef.current) return;
+    endingRef.current = true;
     await endCourse();
     nav.replace("CourseSummary");
   }, [endCourse, nav]);
@@ -74,14 +92,16 @@ export default function RewardModal() {
         <Text style={s.name}>{reward.name}</Text>
 
         <View style={s.row}>
-          {!finished && (
+          {!finishedUI && (
             <Pressable style={[s.btn, s.primary]} onPress={onNext}>
               <Text style={s.btnTextPrimary}>다음 세션 진행</Text>
             </Pressable>
           )}
-          <Pressable style={[s.btn, s.secondary]} onPress={() => nav.navigate("BreakSheet")}>
-            <Text style={s.btnTextSecondary}>잠깐 쉬기</Text>
-          </Pressable>
+          {!finishedUI && (
+            <Pressable style={[s.btn, s.secondary]} onPress={onBreak}>
+              <Text style={s.btnTextSecondary}>잠깐 쉬기</Text>
+            </Pressable>
+          )}
           <Pressable style={[s.btn, s.tertiary]} onPress={onEnd}>
             <Text style={s.btnTextTertiary}>코스 종료</Text>
           </Pressable>
