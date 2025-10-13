@@ -8,6 +8,7 @@ import { useRootNav } from "../navigation/hooks";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
 import { colors } from "../theme/colors";
+import { useVideoPlayer, VideoView } from "expo-video";
 
 export default function FocusSessionScreen() {
   const nav = useRootNav();
@@ -26,6 +27,11 @@ export default function FocusSessionScreen() {
 
   const timer = usePomodoroTimer(focusMs, onComplete);
 
+  const player = useVideoPlayer(require("../../assets/videos/focus.mp4"), (p) => {
+    p.loop = true;
+    p.muted = true;
+  });
+
   useEffect(() => {
     const onFocus = () => {
       if (!current) return;
@@ -37,16 +43,6 @@ export default function FocusSessionScreen() {
     const unsub = nav.addListener?.("focus", onFocus);
     return () => unsub?.();
   }, [nav, current?.id, focusMs, timer]);
-
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active" && notifIdRef.current) {
-        cancelNotification(notifIdRef.current);
-        notifIdRef.current = null;
-      }
-    });
-    return () => sub.remove();
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -68,6 +64,35 @@ export default function FocusSessionScreen() {
       }
     })();
   }, [timer.running, timer.paused, timer.remaining]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        if (notifIdRef.current) {
+          cancelNotification(notifIdRef.current);
+          notifIdRef.current = null;
+        }
+        if (timer.running && !timer.paused) {
+          player.play();
+        } else {
+          player.pause();
+        }
+      } else {
+        player.pause();
+      }
+    });
+    return () => sub.remove();
+  }, [player, timer.running, timer.paused]);
+
+  useEffect(() => {
+    const shouldPlay = !!current && focusMs > 0 && timer.running && !timer.paused;
+    if (shouldPlay) {
+      player.play();
+    } else {
+      player.pause();
+      player.currentTime = 0;
+    }
+  }, [player, current, focusMs, timer.running, timer.paused]);
 
   useSnapshotPersistence(
     useCallback(() => {
@@ -114,6 +139,13 @@ export default function FocusSessionScreen() {
 
   return (
     <View style={s.wrap}>
+      <VideoView
+        style={s.bgVideo}
+        player={player}
+        contentFit="cover"
+        allowsFullscreen={false}
+        allowsPictureInPicture={false}
+      />
       <View style={s.center}>
         <Text style={s.badge}>
           {current.completedSessions}/{current.plannedSessions} 세션
@@ -140,6 +172,7 @@ export default function FocusSessionScreen() {
 
 const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: colors.surface },
+  bgVideo: { ...StyleSheet.absoluteFillObject },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   badge: { fontSize: 14, color: colors.subtitle, marginBottom: 10 },
   timer: { fontSize: 64, fontWeight: "800", letterSpacing: 1, marginBottom: 22, color: colors.ink },
