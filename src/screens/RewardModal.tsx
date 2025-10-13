@@ -16,7 +16,7 @@ export default function RewardModal() {
   const [empty, setEmpty] = useState(false);
 
   const pool = useMemo(() => FOODS, []);
-
+  const finished = current ? current.completedSessions >= current.plannedSessions : false;
   useEffect(() => {
     if (!current || reward || empty) return;
     const res = drawReward(pool);
@@ -30,9 +30,15 @@ export default function RewardModal() {
     completeSession({ itemId: res.item.id, acquiredAt });
   }, [current, reward, empty, pool, addLog, completeSession]);
 
-  const onNext = useCallback(() => {
+  const onNext = useCallback(async () => {
+    if (!current) return;
+    if (finished) {
+      await endCourse();
+      nav.replace("CourseSummary");
+      return;
+    }
     nav.goBack();
-  }, [nav]);
+  }, [current, endCourse, nav]);
 
   const onEnd = useCallback(async () => {
     await endCourse();
@@ -68,9 +74,11 @@ export default function RewardModal() {
         <Text style={s.name}>{reward.name}</Text>
 
         <View style={s.row}>
-          <Pressable style={[s.btn, s.primary]} onPress={onNext}>
-            <Text style={s.btnTextPrimary}>다음 세션 진행</Text>
-          </Pressable>
+          {!finished && (
+            <Pressable style={[s.btn, s.primary]} onPress={onNext}>
+              <Text style={s.btnTextPrimary}>다음 세션 진행</Text>
+            </Pressable>
+          )}
           <Pressable style={[s.btn, s.secondary]} onPress={() => nav.navigate("BreakSheet")}>
             <Text style={s.btnTextSecondary}>잠깐 쉬기</Text>
           </Pressable>
