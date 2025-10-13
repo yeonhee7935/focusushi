@@ -11,6 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useSettings } from "../hooks/useSettings";
+import { colors } from "../theme/colors";
 
 export default function CourseSetupScreen() {
   const nav = useNavigation();
@@ -25,7 +26,7 @@ export default function CourseSetupScreen() {
     const p = Number(planned);
     const f = Number(focusMin);
     const b = Number(breakMin);
-    return Number.isFinite(p) && p > 0 && p <= 12 && f >= 5 && f <= 180 && b >= 0 && b <= 60;
+    return Number.isFinite(p) && p > 0 && p <= 12 && f >= 0 && f <= 180 && b >= 0 && b <= 60;
   }, [planned, focusMin, breakMin]);
 
   const onStart = useCallback(async () => {
@@ -50,10 +51,11 @@ export default function CourseSetupScreen() {
     >
       <Pressable style={s.backdrop} onPress={close} />
       <View style={s.sheet} accessible accessibilityLabel="Course Setup Sheet">
-        <Text style={s.title}>코스 설정</Text>
+        <Text style={s.title}>집중 세션 설정</Text>
+        <Text style={s.subtitle}>오늘은 몇 접시쯤 완성해볼까요?</Text>
 
         <View style={s.row}>
-          <Text style={s.label}>연속 세션 수</Text>
+          <Text style={s.label}>세션 수 (연속으로 진행)</Text>
           <TextInput
             style={s.input}
             value={planned}
@@ -61,11 +63,12 @@ export default function CourseSetupScreen() {
             keyboardType="number-pad"
             maxLength={2}
             placeholder="3"
+            placeholderTextColor={colors.subtitle}
           />
         </View>
 
         <View style={s.row}>
-          <Text style={s.label}>집중 시간(분)</Text>
+          <Text style={s.label}>집중 시간 (분)</Text>
           <TextInput
             style={s.input}
             value={focusMin}
@@ -73,11 +76,12 @@ export default function CourseSetupScreen() {
             keyboardType="number-pad"
             maxLength={3}
             placeholder="25"
+            placeholderTextColor={colors.subtitle}
           />
         </View>
 
         <View style={s.row}>
-          <Text style={s.label}>휴식 시간(분)</Text>
+          <Text style={s.label}>휴식 시간 (분)</Text>
           <TextInput
             style={s.input}
             value={breakMin}
@@ -85,6 +89,7 @@ export default function CourseSetupScreen() {
             keyboardType="number-pad"
             maxLength={2}
             placeholder="5"
+            placeholderTextColor={colors.subtitle}
           />
         </View>
 
@@ -98,7 +103,7 @@ export default function CourseSetupScreen() {
         </Pressable>
 
         <Pressable onPress={close} style={s.secondaryBtn}>
-          <Text style={s.secondaryText}>취소</Text>
+          <Text style={s.secondaryText}>닫기</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -107,35 +112,38 @@ export default function CourseSetupScreen() {
 
 const s = StyleSheet.create({
   wrap: { flex: 1, justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "#0006" },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "#0005" },
   sheet: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 28,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: colors.surface,
+    padding: 36,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.stroke,
   },
-  title: { fontSize: 18, fontWeight: "700", marginBottom: 12 },
-  row: { marginBottom: 12 },
-  label: { fontSize: 13, color: "#444", marginBottom: 6 },
+  title: { fontSize: 22, fontWeight: "800", color: colors.ink },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 18 },
+  row: { marginBottom: 14 },
+  label: { fontSize: 15, color: colors.ink, fontWeight: "600", marginBottom: 6 },
   input: {
     borderWidth: 1,
-    borderColor: "#e2e2e2",
+    borderColor: colors.stroke,
     borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 17,
+    color: colors.ink,
   },
   cta: {
-    marginTop: 8,
-    backgroundColor: "#2E86DE",
-    paddingVertical: 14,
+    marginTop: 10,
+    backgroundColor: colors.primary,
+    paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",
   },
-  ctaDisabled: { backgroundColor: "#a8c7ef" },
-  ctaText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  secondaryBtn: { marginTop: 8, alignItems: "center" },
-  secondaryText: { color: "#666" },
+  ctaDisabled: { backgroundColor: "#ffb8a8" },
+  ctaText: { color: colors.primaryTextOn, fontSize: 17, fontWeight: "800" },
+  secondaryBtn: { marginTop: 10, alignItems: "center" },
+  secondaryText: { color: colors.subtitle, fontSize: 15 },
 });

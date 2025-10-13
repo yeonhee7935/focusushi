@@ -6,6 +6,7 @@ import { formatMMSS } from "../utils/time";
 import { useRootNav } from "../navigation/hooks";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
+import { colors } from "../theme/colors";
 
 export default function FocusSessionScreen() {
   const nav = useRootNav();
@@ -38,8 +39,8 @@ export default function FocusSessionScreen() {
         }
         notifIdRef.current = await scheduleLocal(
           timer.remaining,
-          "집중 시간이 끝났어요",
-          "보상을 받아볼까요?",
+          "집중이 끝났어요",
+          "초밥을 받아볼까요?",
         );
       } else {
         if (notifIdRef.current) {
@@ -85,9 +86,9 @@ export default function FocusSessionScreen() {
   if (!current) {
     return (
       <View style={s.center}>
-        <Text style={s.title}>진행 중인 코스가 없습니다</Text>
+        <Text style={s.title}>진행 중인 세션이 없어요</Text>
         <Pressable style={s.cta} onPress={() => nav.navigate("Tabs")}>
-          <Text style={s.ctaText}>돌아가기</Text>
+          <Text style={s.ctaText}>홈으로 돌아가기</Text>
         </Pressable>
       </View>
     );
@@ -97,17 +98,17 @@ export default function FocusSessionScreen() {
     <View style={s.wrap}>
       <View style={s.center}>
         <Text style={s.badge}>
-          {current.completedSessions}/{current.plannedSessions}
+          {current.completedSessions}/{current.plannedSessions} 세션
         </Text>
         <Text style={s.timer}>{formatMMSS(timer.remaining)}</Text>
         <View style={s.row}>
           {timer.paused ? (
             <Pressable style={[s.btn, s.primary]} onPress={timer.resume}>
-              <Text style={s.btnTextPrimary}>재개</Text>
+              <Text style={s.btnTextPrimary}>계속하기</Text>
             </Pressable>
           ) : (
             <Pressable style={[s.btn, s.secondary]} onPress={timer.pause}>
-              <Text style={s.btnTextSecondary}>일시정지</Text>
+              <Text style={s.btnTextSecondary}>잠시 멈추기</Text>
             </Pressable>
           )}
           <Pressable style={[s.btn, s.danger]} onPress={onEnd}>
@@ -120,19 +121,24 @@ export default function FocusSessionScreen() {
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: "#fff" },
+  wrap: { flex: 1, backgroundColor: colors.surface },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  badge: { fontSize: 13, color: "#666", marginBottom: 8 },
-  timer: { fontSize: 56, fontWeight: "800", letterSpacing: 1, marginBottom: 20 },
+  badge: { fontSize: 14, color: colors.subtitle, marginBottom: 10 },
+  timer: { fontSize: 64, fontWeight: "800", letterSpacing: 1, marginBottom: 22, color: colors.ink },
   row: { flexDirection: "row", gap: 12 },
-  btn: { paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10, borderWidth: 1 },
-  primary: { backgroundColor: "#2E86DE", borderColor: "#2E86DE" },
-  secondary: { backgroundColor: "#fff", borderColor: "#ddd" },
+  btn: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, borderWidth: 1 },
+  primary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  secondary: { backgroundColor: "#fff", borderColor: colors.stroke },
   danger: { backgroundColor: "#fff0f0", borderColor: "#e74c3c" },
-  btnTextPrimary: { color: "#fff", fontWeight: "700" },
-  btnTextSecondary: { color: "#333", fontWeight: "700" },
-  btnTextDanger: { color: "#e74c3c", fontWeight: "700" },
-  title: { fontSize: 18, fontWeight: "700", marginBottom: 12 },
-  cta: { backgroundColor: "#2E86DE", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
-  ctaText: { color: "#fff", fontWeight: "700" },
+  btnTextPrimary: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  btnTextSecondary: { color: colors.ink, fontWeight: "700", fontSize: 16 },
+  btnTextDanger: { color: "#e74c3c", fontWeight: "700", fontSize: 16 },
+  title: { fontSize: 20, fontWeight: "800", marginBottom: 14, color: colors.ink },
+  cta: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  ctaText: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
 });

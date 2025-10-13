@@ -3,6 +3,8 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../navigation/types";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../theme/colors";
 
 export default function HomeIdleScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -12,29 +14,35 @@ export default function HomeIdleScreen() {
   }, [nav]);
 
   return (
-    <View style={s.wrap}>
+    <SafeAreaView style={s.wrap}>
       <View style={s.center}>
-        <Text style={s.title}>Focusushi</Text>
-        <Text style={s.subtitle}>넌 집중을 해라, 난 초밥을 만들테니</Text>
+        <Text style={s.title}>포커스시</Text>
+        <Text style={s.subtitle}>어서 오세요. </Text>
+        <Text style={s.subtitle}>초밥을 만들어드릴게요.</Text>
 
         <Pressable style={s.cta} onPress={onStart} accessibilityRole="button">
-          <Text style={s.ctaText}>Start</Text>
+          <Text style={s.ctaText}>집중 시작하기</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: "#fff" },
+  wrap: { flex: 1, backgroundColor: colors.surface },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  title: { fontSize: 28, fontWeight: "700", marginBottom: 6 },
-  subtitle: { fontSize: 14, color: "#666", marginBottom: 24 },
+  title: { fontSize: 34, fontWeight: "800", color: colors.ink, marginBottom: 16 },
+  subtitle: { fontSize: 16, color: colors.subtitle, textAlign: "center" },
   cta: {
-    paddingHorizontal: 28,
-    paddingVertical: 14,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
     borderRadius: 999,
-    backgroundColor: "#2E86DE",
+    backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.stroke,
+    minWidth: 220,
+    alignItems: "center",
+    marginTop: 16,
   },
-  ctaText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  ctaText: { color: colors.primaryTextOn, fontSize: 18, fontWeight: "800" },
 });

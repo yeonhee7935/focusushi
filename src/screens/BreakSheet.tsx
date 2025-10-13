@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { formatMMSS } from "../utils/time";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
+import { colors } from "../theme/colors";
 
 export default function BreakSheet() {
   const nav = useNavigation();
@@ -42,11 +43,12 @@ export default function BreakSheet() {
   return (
     <View style={s.dim} accessible accessibilityLabel="Break Sheet">
       <View style={s.sheet}>
-        <Text style={s.title}>휴식 시간</Text>
+        <Text style={s.title}>휴식 중</Text>
+        <Text style={s.subtitle}>물 한 모금하고, 숨 고를까요?</Text>
         <Text style={s.timer}>{formatMMSS(remaining)}</Text>
 
         <Pressable style={[s.btn, s.primary]} onPress={onClose}>
-          <Text style={s.btnTextPrimary}>휴식 종료</Text>
+          <Text style={s.btnTextPrimary}>다음 세션 시작</Text>
         </Pressable>
       </View>
     </View>
@@ -57,15 +59,19 @@ const s = StyleSheet.create({
   dim: { flex: 1, backgroundColor: "#0006", alignItems: "center", justifyContent: "flex-end" },
   sheet: {
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
-    paddingVertical: 24,
+    paddingTop: 22,
+    paddingBottom: 26,
     alignItems: "center",
+    borderTopWidth: 1,
+    borderColor: colors.stroke,
   },
-  title: { fontSize: 18, fontWeight: "700", marginBottom: 12 },
-  timer: { fontSize: 40, fontWeight: "800", marginBottom: 20 },
+  title: { fontSize: 20, fontWeight: "800", color: colors.ink },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginTop: 6, marginBottom: 10 },
+  timer: { fontSize: 48, fontWeight: "800", marginBottom: 18, color: colors.ink },
   btn: {
     width: "100%",
     borderRadius: 12,
@@ -74,6 +80,6 @@ const s = StyleSheet.create({
     alignItems: "center",
     marginTop: 8,
   },
-  primary: { backgroundColor: "#2E86DE", borderColor: "#2E86DE" },
-  btnTextPrimary: { color: "#fff", fontWeight: "700" },
+  primary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  btnTextPrimary: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
 });

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Switch, TextInput, Pressable, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSettings } from "../hooks/useSettings";
+import { colors } from "../theme/colors";
 
 export default function SettingsScreen() {
   const { settings, setSettings, resetSettings, loaded } = useSettings();
@@ -24,7 +25,7 @@ export default function SettingsScreen() {
       defaultFocusMs: Number(focusMin) * 60000,
       defaultBreakMs: Number(breakMin) * 60000,
     });
-    Alert.alert("저장됨", "설정이 저장되었습니다.");
+    Alert.alert("저장 완료", "설정을 반영했어요.");
   }, [valid, vibration, sound, focusMin, breakMin, setSettings]);
 
   const onReset = useCallback(() => {
@@ -47,47 +48,51 @@ export default function SettingsScreen() {
   if (!loaded) {
     return (
       <SafeAreaView style={s.wrap}>
-        <Text style={s.title}>설정 로딩중…</Text>
+        <Text style={s.title}>설정을 불러오는 중…</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={s.wrap} edges={["top", "left", "right"]}>
-      <Text style={s.title}>설정</Text>
+      <Text style={s.title}>앱 설정</Text>
 
-      <View style={s.row}>
-        <Text style={s.label}>진동</Text>
-        <Switch value={vibration} onValueChange={setVibration} />
-      </View>
+      <View style={s.card}>
+        <View style={s.row}>
+          <Text style={s.label}>진동 알림</Text>
+          <Switch value={vibration} onValueChange={setVibration} />
+        </View>
 
-      <View style={s.row}>
-        <Text style={s.label}>사운드</Text>
-        <Switch value={sound} onValueChange={setSound} />
-      </View>
+        <View style={s.row}>
+          <Text style={s.label}>사운드 효과</Text>
+          <Switch value={sound} onValueChange={setSound} />
+        </View>
 
-      <View style={s.row}>
-        <Text style={s.label}>기본 집중 시간(분)</Text>
-        <TextInput
-          style={s.input}
-          value={focusMin}
-          onChangeText={setFocusMin}
-          keyboardType="number-pad"
-          maxLength={3}
-          placeholder="25"
-        />
-      </View>
+        <View style={s.row}>
+          <Text style={s.label}>기본 집중 시간 (분)</Text>
+          <TextInput
+            style={s.input}
+            value={focusMin}
+            onChangeText={setFocusMin}
+            keyboardType="number-pad"
+            maxLength={3}
+            placeholder="25"
+            placeholderTextColor={colors.subtitle}
+          />
+        </View>
 
-      <View style={s.row}>
-        <Text style={s.label}>기본 휴식 시간(분)</Text>
-        <TextInput
-          style={s.input}
-          value={breakMin}
-          onChangeText={setBreakMin}
-          keyboardType="number-pad"
-          maxLength={2}
-          placeholder="5"
-        />
+        <View style={s.row}>
+          <Text style={s.label}>기본 휴식 시간 (분)</Text>
+          <TextInput
+            style={s.input}
+            value={breakMin}
+            onChangeText={setBreakMin}
+            keyboardType="number-pad"
+            maxLength={2}
+            placeholder="5"
+            placeholderTextColor={colors.subtitle}
+          />
+        </View>
       </View>
 
       <Pressable style={[s.btn, valid ? s.primary : s.disabled]} disabled={!valid} onPress={onSave}>
@@ -102,30 +107,45 @@ export default function SettingsScreen() {
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: "#fff", padding: 16, gap: 12 },
-  title: { fontSize: 20, fontWeight: "800", marginBottom: 4 },
-  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  label: { fontSize: 14, color: "#333" },
-  input: {
-    width: 100,
+  wrap: { flex: 1, backgroundColor: colors.surface, padding: 16, gap: 12 },
+  title: { fontSize: 22, fontWeight: "800", marginBottom: 6, color: colors.ink },
+  card: {
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#e2e2e2",
+    borderColor: colors.stroke,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
+  label: { fontSize: 16, color: colors.ink, fontWeight: "700" },
+  input: {
+    width: 110,
+    height: 44,
+    borderWidth: 1,
+    borderColor: colors.stroke,
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 10,
     fontSize: 16,
     textAlign: "right",
+    backgroundColor: "#fff",
+    color: colors.ink,
   },
   btn: {
-    marginTop: 8,
+    marginTop: 10,
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
     alignItems: "center",
   },
-  primary: { backgroundColor: "#2E86DE", borderColor: "#2E86DE" },
-  disabled: { backgroundColor: "#a8c7ef", borderColor: "#a8c7ef" },
-  secondary: { backgroundColor: "#fff", borderColor: "#ddd" },
-  btnTextPrimary: { color: "#fff", fontWeight: "700" },
-  btnTextSecondary: { color: "#333", fontWeight: "700" },
+  primary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  disabled: { backgroundColor: "#ffb5a9", borderColor: "#ffb5a9" },
+  secondary: { backgroundColor: "#fff", borderColor: colors.stroke },
+  btnTextPrimary: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  btnTextSecondary: { color: colors.ink, fontWeight: "700", fontSize: 16 },
 });

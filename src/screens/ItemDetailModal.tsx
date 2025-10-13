@@ -7,8 +7,28 @@ import { FOODS } from "../data/foods";
 import { useAcquisition } from "../hooks/useAcquisition";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRootNav } from "../navigation/hooks";
+import { colors } from "../theme/colors";
 
 type R = RouteProp<RootStackParamList, "ItemDetail">;
+
+function rarityKo(r: string) {
+  switch (r) {
+    case "COMMON":
+      return "보통";
+    case "UNCOMMON":
+      return "조금 특별";
+    case "RARE":
+      return "레어";
+    case "EPIC":
+      return "에픽";
+    case "LEGENDARY":
+      return "전설";
+    case "ULTRA_RARE":
+      return "극레어";
+    default:
+      return r;
+  }
+}
 
 export default function ItemDetailModal() {
   const nav = useRootNav();
@@ -50,13 +70,14 @@ export default function ItemDetailModal() {
       <SafeAreaView style={s.sheet} edges={["bottom"]}>
         <View style={s.thumb} />
         <Text style={s.title}>{item.name}</Text>
-        <Text style={s.meta}>{item.rarity}</Text>
-        <Text style={s.meta}>소유: {ownedCount}</Text>
+
+        <Text style={[s.meta, s.metaPill]}>{rarityKo(item.rarity)}</Text>
+        <Text style={s.meta}>먹어본 횟수: {ownedCount}</Text>
 
         <View style={s.section}>
-          <Text style={s.sectionTitle}>최근 획득</Text>
+          <Text style={s.sectionTitle}>최근에 받은 초밥</Text>
           {itemLogs.length === 0 ? (
-            <Text style={s.empty}>기록 없음</Text>
+            <Text style={s.empty}>아직 기록이 없어요</Text>
           ) : (
             itemLogs.map((l) => (
               <Text key={l.acquiredAt} style={s.log}>
@@ -66,7 +87,7 @@ export default function ItemDetailModal() {
           )}
         </View>
 
-        <Pressable style={s.btn} onPress={close}>
+        <Pressable style={s.btn} onPress={close} accessibilityRole="button">
           <Text style={s.btnText}>닫기</Text>
         </Pressable>
       </SafeAreaView>
@@ -78,43 +99,55 @@ const s = StyleSheet.create({
   dim: { flex: 1, backgroundColor: "#0006", justifyContent: "flex-end" },
   backdrop: { ...StyleSheet.absoluteFillObject },
   sheet: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 24,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    borderTopWidth: 1,
+    borderColor: colors.stroke,
   },
   card: {
     width: "86%",
     alignSelf: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: colors.stroke,
     alignItems: "center",
   },
   thumb: {
     height: 140,
     borderRadius: 12,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#F7F3EC",
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: colors.stroke,
   },
-  title: { fontSize: 20, fontWeight: "800", marginTop: 12 },
-  meta: { color: "#555", marginTop: 4 },
-  section: { marginTop: 16 },
-  sectionTitle: { fontSize: 14, fontWeight: "700", marginBottom: 6 },
-  empty: { color: "#777" },
-  log: { color: "#333", marginTop: 2 },
+  title: { fontSize: 22, fontWeight: "800", marginTop: 12, color: colors.ink },
+  meta: { color: colors.ink, marginTop: 6, fontSize: 14 },
+  metaPill: {
+    alignSelf: "flex-start",
+    backgroundColor: "#fff2ee",
+    borderWidth: 1,
+    borderColor: colors.stroke,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    fontWeight: "800",
+  },
+  section: { marginTop: 18 },
+  sectionTitle: { fontSize: 15, fontWeight: "800", marginBottom: 8, color: colors.ink },
+  empty: { color: colors.subtitle },
+  log: { color: colors.ink, marginTop: 4, fontSize: 14 },
   btn: {
-    marginTop: 16,
-    backgroundColor: "#2E86DE",
+    marginTop: 18,
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
   },
-  btnText: { color: "#fff", fontWeight: "700" },
+  btnText: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
 });

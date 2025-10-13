@@ -6,6 +6,7 @@ import { drawReward } from "../utils/gacha";
 import { FOODS } from "../data/foods";
 import type { FoodItem } from "../data/types";
 import { useRootNav } from "../navigation/hooks";
+import { colors } from "../theme/colors";
 
 export default function RewardModal() {
   const nav = useRootNav();
@@ -42,8 +43,8 @@ export default function RewardModal() {
     return (
       <View style={s.dim}>
         <View style={s.card}>
-          <Text style={s.title}>보상 풀 없음</Text>
-          <Text style={{ marginBottom: 16 }}>아이템 목록이 비어 있습니다.</Text>
+          <Text style={s.title}>준비된 초밥이 없어요</Text>
+          <Text style={s.subtitle}>다음에 다시 받아볼까요?</Text>
           <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
             <Text style={s.btnTextSecondary}>코스 종료</Text>
           </Pressable>
@@ -63,24 +64,18 @@ export default function RewardModal() {
   return (
     <View style={s.dim} accessible accessibilityLabel="Reward Modal">
       <View style={s.card}>
-        <Text style={s.title}>보상 획득!</Text>
+        <Text style={s.title}>초밥이 나왔습니다!</Text>
         <Text style={s.name}>{reward.name}</Text>
+
         <View style={s.row}>
           <Pressable style={[s.btn, s.primary]} onPress={onNext}>
-            <Text style={s.btnTextPrimary}>다음 세션</Text>
-          </Pressable>
-          <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
-            <Text style={s.btnTextSecondary}>코스 종료</Text>
-          </Pressable>
-
-          <Pressable style={[s.btn, s.primary]} onPress={onNext}>
-            <Text style={s.btnTextPrimary}>다음 세션</Text>
+            <Text style={s.btnTextPrimary}>다음 세션 진행</Text>
           </Pressable>
           <Pressable style={[s.btn, s.secondary]} onPress={() => nav.navigate("BreakSheet")}>
-            <Text style={s.btnTextSecondary}>휴식하기</Text>
+            <Text style={s.btnTextSecondary}>잠깐 쉬기</Text>
           </Pressable>
-          <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
-            <Text style={s.btnTextSecondary}>코스 종료</Text>
+          <Pressable style={[s.btn, s.tertiary]} onPress={onEnd}>
+            <Text style={s.btnTextTertiary}>코스 종료</Text>
           </Pressable>
         </View>
       </View>
@@ -92,17 +87,41 @@ const s = StyleSheet.create({
   dim: { flex: 1, backgroundColor: "#0006", alignItems: "center", justifyContent: "center" },
   card: {
     width: "86%",
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 16,
-    padding: 20,
+    padding: 22,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.stroke,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "800",
+    marginBottom: 6,
+    color: colors.ink,
+    textAlign: "center",
+  },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 14, textAlign: "center" },
+  name: {
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: 18,
+    color: colors.ink,
+    textAlign: "center",
+  },
+  row: { flexDirection: "row", gap: 12, flexWrap: "wrap", justifyContent: "center" },
+  btn: {
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    minWidth: 120,
     alignItems: "center",
   },
-  title: { fontSize: 18, fontWeight: "800", marginBottom: 8 },
-  name: { fontSize: 20, fontWeight: "800", marginBottom: 16 },
-  row: { flexDirection: "row", gap: 12 },
-  btn: { paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10, borderWidth: 1 },
-  primary: { backgroundColor: "#2E86DE", borderColor: "#2E86DE" },
-  secondary: { backgroundColor: "#fff", borderColor: "#ddd" },
-  btnTextPrimary: { color: "#fff", fontWeight: "700" },
-  btnTextSecondary: { color: "#333", fontWeight: "700" },
+  primary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  secondary: { backgroundColor: "#fff", borderColor: colors.stroke },
+  tertiary: { backgroundColor: "#fff", borderColor: colors.stroke },
+  btnTextPrimary: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  btnTextSecondary: { color: colors.ink, fontWeight: "700", fontSize: 16 },
+  btnTextTertiary: { color: colors.subtitle, fontWeight: "700", fontSize: 16 },
 });
