@@ -1,5 +1,6 @@
+// src/screens/FocusSessionScreen.tsx
 import { useCallback, useEffect, useRef } from "react";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert, AppState } from "react-native";
 import { useCourse } from "../hooks/useCourse";
 import { useSnapshotPersistence } from "../hooks/useSnapshot";
 import { formatMMSS } from "../utils/time";
@@ -25,35 +26,47 @@ export default function FocusSessionScreen() {
 
   const timer = usePomodoroTimer(focusMs, onComplete);
 
-  // 최초 진입/코스 변경 시 시작
   useEffect(() => {
-    if (!current || focusMs <= 0) return;
-    timer.start(focusMs);
-  }, [current?.id, focusMs]); // start 한 번만
-
-  // 세션 하나 완료 후(= completedSessions 변경) 다음 세션 재시작
-  useEffect(() => {
-    if (!current || focusMs <= 0) return;
-    if (current.completedSessions > 0 && current.completedSessions < current.plannedSessions) {
+    if (!current) return;
+    if (current.completedSessions >= current.plannedSessions) {
       timer.stop();
-      timer.start(focusMs);
+      if (notifIdRef.current) cancelNotification(notifIdRef.current);
+      nav.replace("CourseSummary");
     }
-  }, [current?.completedSessions, current?.plannedSessions, focusMs]);
+  }, [current?.completedSessions, current?.plannedSessions, nav, timer]);
 
-  // 화면 포커스 재획득 시(휴식에서 돌아올 때 등) 남은 시간이 0이면 재시작
   useEffect(() => {
-    const unsub = nav.addListener?.("focus", () => {
-      if (current && focusMs > 0 && !timer.running && timer.remaining <= 0) {
+    const onFocus = () => {
+      if (!current) return;
+      if (current.completedSessions >= current.plannedSessions) {
+        timer.stop();
+        if (notifIdRef.current) cancelNotification(notifIdRef.current);
+        nav.replace("CourseSummary");
+        return;
+      }
+      if (focusMs > 0) {
+        timer.stop();
         timer.start(focusMs);
       }
-    });
-    return unsub;
-  }, [nav, current?.id, focusMs, timer.running, timer.remaining]);
+    };
+    const unsub = nav.addListener?.("focus", onFocus);
+    return () => unsub?.();
+  }, [nav, current?.id, current?.completedSessions, current?.plannedSessions, focusMs, timer, nav]);
 
   useEffect(() => {
-    // running이면 남은 시간으로 예약, 일시정지/정지면 취소
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active" && notifIdRef.current) {
+        cancelNotification(notifIdRef.current);
+        notifIdRef.current = null;
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      if (timer.running && !timer.paused) {
+      const state = AppState.currentState;
+      if (timer.running && !timer.paused && state !== "active") {
         if (notifIdRef.current) {
           await cancelNotification(notifIdRef.current);
         }
