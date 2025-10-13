@@ -25,10 +25,30 @@ export default function FocusSessionScreen() {
 
   const timer = usePomodoroTimer(focusMs, onComplete);
 
+  // 최초 진입/코스 변경 시 시작
   useEffect(() => {
     if (!current || focusMs <= 0) return;
     timer.start(focusMs);
   }, [current?.id, focusMs]); // start 한 번만
+
+  // 세션 하나 완료 후(= completedSessions 변경) 다음 세션 재시작
+  useEffect(() => {
+    if (!current || focusMs <= 0) return;
+    if (current.completedSessions > 0 && current.completedSessions < current.plannedSessions) {
+      timer.stop();
+      timer.start(focusMs);
+    }
+  }, [current?.completedSessions, current?.plannedSessions, focusMs]);
+
+  // 화면 포커스 재획득 시(휴식에서 돌아올 때 등) 남은 시간이 0이면 재시작
+  useEffect(() => {
+    const unsub = nav.addListener?.("focus", () => {
+      if (current && focusMs > 0 && !timer.running && timer.remaining <= 0) {
+        timer.start(focusMs);
+      }
+    });
+    return unsub;
+  }, [nav, current?.id, focusMs, timer.running, timer.remaining]);
 
   useEffect(() => {
     // running이면 남은 시간으로 예약, 일시정지/정지면 취소
