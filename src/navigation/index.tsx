@@ -30,7 +30,7 @@ export default function RootNavigator() {
         <Stack.Screen
           name="FocusSession"
           component={FocusSessionScreen}
-          options={{ presentation: "fullScreenModal", title: "집중" }}
+          options={{ presentation: "fullScreenModal", headerShown: false }}
         />
         <Stack.Screen
           name="CourseSetup"
@@ -51,8 +51,8 @@ export default function RootNavigator() {
           name="BreakSheet"
           component={BreakSheet}
           options={{
-            presentation: "transparentModal",
-            animation: "fade_from_bottom",
+            presentation: "fullScreenModal",
+            animation: "fade",
             headerShown: false,
           }}
         />
