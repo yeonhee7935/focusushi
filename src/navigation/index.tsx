@@ -8,7 +8,7 @@ import ItemDetailModal from "../screens/ItemDetailModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
 import CourseSetupScreen from "../screens/CourseSetupScreen";
 import { navTheme } from "../theme/navTheme";
-import { colors } from "../theme/colors";
+
 import type { RootStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -18,56 +18,41 @@ export default function RootNavigator() {
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator
         screenOptions={{
-          headerStyle: { backgroundColor: "#fff" },
-          headerShadowVisible: true,
-          headerTitleStyle: { color: colors.ink, fontWeight: "800", fontSize: 18 },
-          headerTintColor: colors.ink,
-          contentStyle: { backgroundColor: colors.surface },
+          headerShown: false,
           animation: "fade",
+          contentStyle: { backgroundColor: "#fff" },
         }}
       >
-        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+        <Stack.Screen name="Tabs" component={Tabs} />
         <Stack.Screen
           name="FocusSession"
           component={FocusSessionScreen}
-          options={{ presentation: "fullScreenModal", headerShown: false }}
+          options={{ presentation: "fullScreenModal" }}
         />
         <Stack.Screen
           name="CourseSetup"
           component={CourseSetupScreen}
-          options={{ presentation: "transparentModal", headerShown: false }}
+          options={{ presentation: "transparentModal" }}
         />
         <Stack.Screen
           name="CourseSummary"
           component={CourseSummaryScreen}
-          options={{
-            presentation: "fullScreenModal",
-            animation: "fade",
-            headerShown: false,
-          }}
+          options={{ presentation: "fullScreenModal", animation: "fade" }}
         />
         <Stack.Screen
           name="ItemDetail"
           component={ItemDetailModal}
-          options={{ title: "상세", presentation: "modal", animation: "slide_from_bottom" }}
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
         />
         <Stack.Screen
           name="BreakSheet"
           component={BreakSheet}
-          options={{
-            presentation: "fullScreenModal",
-            animation: "fade",
-            headerShown: false,
-          }}
+          options={{ presentation: "fullScreenModal", animation: "fade" }}
         />
         <Stack.Screen
           name="RewardModal"
           component={RewardModal}
-          options={{
-            presentation: "transparentModal",
-            animation: "fade_from_bottom",
-            headerShown: false,
-          }}
+          options={{ presentation: "transparentModal", animation: "fade_from_bottom" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

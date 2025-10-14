@@ -21,9 +21,7 @@ export default function Tabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: true,
-        headerStyle: { backgroundColor: "#fff" },
-        headerTitleStyle: { color: colors.ink, fontWeight: "800" },
+        headerShown: false,
         sceneContainerStyle: { backgroundColor: colors.surface },
         tabBarStyle: {
           backgroundColor: "#fff",
@@ -48,21 +46,9 @@ export default function Tabs() {
         tabBarHideOnKeyboard: true,
       })}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeIdleScreen}
-        options={{ title: "포커스시", headerShown: false }}
-      />
-      <Tab.Screen
-        name="Collection"
-        component={CollectionScreen}
-        options={{ title: "내가 먹은 초밥들", headerShown: false }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: "앱 설정", headerShown: false }}
-      />
+      <Tab.Screen name="Home" component={HomeIdleScreen} />
+      <Tab.Screen name="Collection" component={CollectionScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
 }
