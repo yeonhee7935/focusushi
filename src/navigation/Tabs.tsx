@@ -48,13 +48,21 @@ export default function Tabs() {
         tabBarHideOnKeyboard: true,
       })}
     >
-      <Tab.Screen name="Home" component={HomeIdleScreen} options={{ title: "포커스시" }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeIdleScreen}
+        options={{ title: "포커스시", headerShown: false }}
+      />
       <Tab.Screen
         name="Collection"
         component={CollectionScreen}
-        options={{ title: "내가 먹은 초밥들" }}
+        options={{ title: "내가 먹은 초밥들", headerShown: false }}
       />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: "앱 설정" }} />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: "앱 설정", headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }

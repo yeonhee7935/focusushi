@@ -1,21 +1,25 @@
 import { useMemo, useCallback, useRef, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, Animated, Easing } from "react-native";
-import { CommonActions } from "@react-navigation/native";
+import { CommonActions, useRoute } from "@react-navigation/native";
+import type { RouteProp } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useRootNav } from "@/navigation/hooks";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
+import type { RootStackParamList } from "../navigation/types";
 
 export default function CourseSummaryScreen() {
   const nav = useRootNav();
+  const route = useRoute<RouteProp<RootStackParamList, "CourseSummary">>();
   const history = useCourse((s) => s.history);
 
-  const last = useMemo(() => history[history.length - 1] ?? null, [history]);
-  const finished = Boolean(last);
-  const progress = finished ? `${last!.completedSessions}/${last!.plannedSessions}` : "0/0";
-  const acquiredCount = finished ? last!.items.length : 0;
-  const focusMin = finished ? Math.round(last!.focusMs / 60000) : 0;
-  const breakMin = finished ? Math.round(last!.breakMs / 60000) : 0;
+  const snap = route.params?.snapshot;
+  const finished = Boolean(snap) || history.length > 0;
+  const source = snap ?? (history.length ? history[history.length - 1] : null);
+
+  const progress = finished ? `${source!.completedSessions}/${source!.plannedSessions}` : "0/0";
+  const acquiredCount = finished ? source!.items.length : 0;
+  const focusMin = finished ? Math.round(source!.focusMs / 60000) : 0;
+  const breakMin = finished ? Math.round(source!.breakMs / 60000) : 0;
 
   const goHome = useCallback(() => {
     nav.dispatch(
@@ -37,7 +41,7 @@ export default function CourseSummaryScreen() {
   }, [fade]);
 
   return (
-    <SafeAreaView style={s.wrap} edges={["top", "left", "right"]}>
+    <View style={s.wrap}>
       <Animated.View style={[s.card, { opacity: fade }]}>
         <Text style={s.title}>오늘의 초밥 코스</Text>
         {finished ? (
@@ -58,7 +62,7 @@ export default function CourseSummaryScreen() {
           <Text style={s.ctaText}>홈으로 돌아가기</Text>
         </Pressable>
       </Animated.View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -74,35 +78,55 @@ function Row({ label, value }: { label: string; value: string }) {
 const s = StyleSheet.create({
   wrap: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
-    padding: 24,
-    backgroundColor: colors.surface,
+    alignItems: "center",
+    backgroundColor: "#fdfaf6",
   },
   card: {
-    width: "100%",
-    maxWidth: 440,
+    width: "88%",
+    borderRadius: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 22,
+    backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: colors.stroke,
-    borderRadius: 16,
-    padding: 20,
-    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    elevation: 3,
   },
-  title: { fontSize: 22, fontWeight: "800", marginBottom: 6, color: colors.ink },
-  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 12 },
+  title: {
+    fontSize: 24,
+    fontWeight: "800",
+    marginBottom: 8,
+    color: colors.ink,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 15,
+    color: colors.subtitle,
+    marginBottom: 18,
+    textAlign: "center",
+    lineHeight: 22,
+  },
   highlight: { color: colors.primary, fontWeight: "900" },
-  row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 },
-  label: { color: colors.ink, fontSize: 15, fontWeight: "700" },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 0.5,
+    borderColor: "#eee",
+  },
+  label: { color: colors.ink, fontSize: 15, fontWeight: "600" },
   value: { color: colors.ink, fontSize: 16, fontWeight: "800" },
-  empty: { color: colors.subtitle, marginVertical: 16, fontSize: 14 },
+  empty: { color: colors.subtitle, marginVertical: 16, fontSize: 14, textAlign: "center" },
   cta: {
-    marginTop: 16,
+    marginTop: 22,
     backgroundColor: colors.primary,
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.primary,
   },
-  ctaText: { color: colors.primaryTextOn, fontSize: 16, fontWeight: "800" },
+  ctaText: { color: colors.primaryTextOn, fontSize: 17, fontWeight: "800" },
 });

@@ -1,6 +1,13 @@
-// src/screens/RewardModal.tsx
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+  Animated,
+  Easing,
+} from "react-native";
 import { useAcquisition } from "../hooks/useAcquisition";
 import { useCourse } from "../hooks/useCourse";
 import { drawReward } from "../utils/gacha";
@@ -8,6 +15,7 @@ import { FOODS } from "../data/foods";
 import type { FoodItem } from "../data/types";
 import { useRootNav } from "../navigation/hooks";
 import { colors } from "../theme/colors";
+import type { CourseSummarySnapshot } from "../navigation/types";
 
 export default function RewardModal() {
   const nav = useRootNav();
@@ -19,6 +27,22 @@ export default function RewardModal() {
   const [willFinish, setWillFinish] = useState(false);
   const endingRef = useRef(false);
 
+  const popScale = useRef(new Animated.Value(0.8)).current;
+  const popOpacity = useRef(new Animated.Value(0)).current;
+  const runPop = useCallback(() => {
+    popScale.setValue(0.8);
+    popOpacity.setValue(0);
+    Animated.parallel([
+      Animated.timing(popOpacity, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.spring(popScale, { toValue: 1, friction: 6, tension: 120, useNativeDriver: true }),
+    ]).start();
+  }, [popOpacity, popScale]);
+
   const pool = useMemo(() => FOODS, []);
 
   useEffect(() => {
@@ -29,6 +53,7 @@ export default function RewardModal() {
       return;
     }
     setReward(res.item);
+
     const acquiredAt = Date.now();
     addLog(res.item);
     const nextWillFinish = current.completedSessions + 1 >= current.plannedSessions;
@@ -36,20 +61,36 @@ export default function RewardModal() {
     completeSession({ itemId: res.item.id, acquiredAt });
   }, [current, reward, empty, pool, addLog, completeSession]);
 
+  useEffect(() => {
+    if (reward) runPop();
+  }, [reward, runPop]);
+
   const finishedFromStore = current ? current.completedSessions >= current.plannedSessions : false;
   const finishedUI = willFinish || finishedFromStore;
+
+  // 스냅샷은 '이미 반영된 현재 상태'를 그대로 사용한다. (+1 또는 아이템 재추가 금지)
+  const buildSnapshot = useCallback((): CourseSummarySnapshot | undefined => {
+    if (!current) return undefined;
+    return {
+      completedSessions: current.completedSessions,
+      plannedSessions: current.plannedSessions,
+      items: current.items,
+      focusMs: current.focusMs,
+      breakMs: current.breakMs,
+    };
+  }, [current]);
 
   const onNext = useCallback(async () => {
     if (!current) return;
     if (finishedUI) {
       if (endingRef.current) return;
       endingRef.current = true;
+      nav.navigate("CourseSummary", { snapshot: buildSnapshot() });
       await endCourse();
-      nav.replace("CourseSummary");
       return;
     }
     nav.goBack();
-  }, [current, finishedUI, endCourse, nav]);
+  }, [current, finishedUI, endCourse, nav, buildSnapshot]);
 
   const onBreak = useCallback(() => {
     if (finishedUI) return;
@@ -59,9 +100,9 @@ export default function RewardModal() {
   const onEnd = useCallback(async () => {
     if (endingRef.current) return;
     endingRef.current = true;
+    nav.navigate("CourseSummary", { snapshot: buildSnapshot() });
     await endCourse();
-    nav.replace("CourseSummary");
-  }, [endCourse, nav]);
+  }, [endCourse, nav, buildSnapshot]);
 
   if (empty) {
     return (
@@ -87,7 +128,7 @@ export default function RewardModal() {
 
   return (
     <View style={s.dim} accessible accessibilityLabel="Reward Modal">
-      <View style={s.card}>
+      <Animated.View style={[s.card, { transform: [{ scale: popScale }], opacity: popOpacity }]}>
         <Text style={s.title}>초밥이 나왔습니다!</Text>
         <Text style={s.name}>{reward.name}</Text>
 
@@ -106,7 +147,7 @@ export default function RewardModal() {
             <Text style={s.btnTextTertiary}>코스 종료</Text>
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
