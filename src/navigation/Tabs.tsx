@@ -25,23 +25,35 @@ export default function Tabs() {
         sceneContainerStyle: { backgroundColor: colors.surface },
         tabBarStyle: {
           backgroundColor: "#fff",
-          borderTopColor: colors.stroke,
           height: 56 + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: Math.max(8, insets.bottom),
+          paddingTop: 10,
+          paddingBottom: Math.max(10, insets.bottom),
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.subtitle,
         tabBarLabel: ({ focused, color }) => (
-          <Text style={{ color, fontSize: 11, fontWeight: focused ? "800" : "700" }}>
+          <Text
+            style={{
+              color,
+              fontSize: 14,
+              marginTop: 4,
+              fontWeight: focused ? "800" : "700",
+            }}
+          >
             {route.name === "Home" ? "홈" : route.name === "Collection" ? "컬렉션" : "설정"}
           </Text>
         ),
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           const s = size ?? 22;
-          if (route.name === "Home") return <Ionicons name="home" size={s} color={color} />;
-          if (route.name === "Collection") return <Ionicons name="grid" size={s} color={color} />;
-          return <Ionicons name="settings" size={s} color={color} />;
+          if (route.name === "Home") {
+            return <Ionicons name={focused ? "home" : "home-outline"} size={s} color={color} />;
+          }
+          if (route.name === "Collection") {
+            return <Ionicons name={focused ? "grid" : "grid-outline"} size={s} color={color} />;
+          }
+          return (
+            <Ionicons name={focused ? "settings" : "settings-outline"} size={s} color={color} />
+          );
         },
         tabBarHideOnKeyboard: true,
       })}

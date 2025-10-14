@@ -8,7 +8,6 @@ import ItemDetailModal from "../screens/ItemDetailModal";
 import CourseSummaryScreen from "../screens/CourseSummaryScreen";
 import CourseSetupScreen from "../screens/CourseSetupScreen";
 import { navTheme } from "../theme/navTheme";
-
 import type { RootStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
