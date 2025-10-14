@@ -16,11 +16,13 @@ import type { FoodItem } from "../data/types";
 import { useRootNav } from "../navigation/hooks";
 import { colors } from "../theme/colors";
 import type { CourseSummarySnapshot } from "../navigation/types";
+import { useFeedback } from "../hooks/useFeedback";
 
 export default function RewardModal() {
   const nav = useRootNav();
   const addLog = useAcquisition((s) => s.addLog);
   const { current, completeSession, endCourse } = useCourse();
+  const { haptic, sfx } = useFeedback();
 
   const [reward, setReward] = useState<FoodItem | null>(null);
   const [empty, setEmpty] = useState(false);
@@ -62,13 +64,16 @@ export default function RewardModal() {
   }, [current, reward, empty, pool, addLog, completeSession]);
 
   useEffect(() => {
-    if (reward) runPop();
-  }, [reward, runPop]);
+    if (reward) {
+      runPop();
+      sfx("reward");
+      haptic("success");
+    }
+  }, [reward, runPop, sfx, haptic]);
 
   const finishedFromStore = current ? current.completedSessions >= current.plannedSessions : false;
   const finishedUI = willFinish || finishedFromStore;
 
-  // 스냅샷은 '이미 반영된 현재 상태'를 그대로 사용한다. (+1 또는 아이템 재추가 금지)
   const buildSnapshot = useCallback((): CourseSummarySnapshot | undefined => {
     if (!current) return undefined;
     return {

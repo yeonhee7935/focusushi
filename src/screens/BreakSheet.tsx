@@ -1,4 +1,3 @@
-// src/screens/BreakSheet.tsx
 import { useEffect, useState, useCallback, useRef } from "react";
 import { View, Text, Pressable, StyleSheet, AppState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -6,10 +5,13 @@ import { useCourse } from "../hooks/useCourse";
 import { formatMMSS } from "../utils/time";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
 import { useVideoPlayer, VideoView } from "expo-video";
+import { useFeedback } from "../hooks/useFeedback";
 
 export default function BreakSheet() {
   const nav = useNavigation();
   const { current } = useCourse();
+  const { haptic, sfx } = useFeedback();
+
   const [remaining, setRemaining] = useState(current?.breakMs ?? 0);
   const notifIdRef = useRef<string | null>(null);
 
@@ -20,6 +22,9 @@ export default function BreakSheet() {
 
   useEffect(() => {
     if (!current) return;
+    sfx("breakStart");
+    haptic("light");
+
     const id = setInterval(() => setRemaining((ms) => Math.max(0, ms - 1000)), 1000);
     (async () => {
       if (notifIdRef.current) await cancelNotification(notifIdRef.current);
@@ -65,8 +70,12 @@ export default function BreakSheet() {
   }, [nav]);
 
   useEffect(() => {
-    if (remaining <= 0) onClose();
-  }, [remaining, onClose]);
+    if (remaining <= 0) {
+      sfx("breakEnd");
+      haptic("success");
+      onClose();
+    }
+  }, [remaining, onClose, sfx, haptic]);
 
   if (!current) return null;
 

@@ -1,4 +1,3 @@
-// src/screens/FocusSessionScreen.tsx
 import { useCallback, useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet, Alert, AppState } from "react-native";
 import { useCourse } from "../hooks/useCourse";
@@ -9,10 +8,12 @@ import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
 import { colors } from "../theme/colors";
 import { useVideoPlayer, VideoView } from "expo-video";
+import { useFeedback } from "../hooks/useFeedback";
 
 export default function FocusSessionScreen() {
   const nav = useRootNav();
   const { current, endCourse } = useCourse();
+  const { haptic, sfx } = useFeedback();
 
   const focusMs = current?.focusMs ?? 0;
   const notifIdRef = useRef<string | null>(null);
@@ -38,11 +39,13 @@ export default function FocusSessionScreen() {
       if (focusMs > 0) {
         timer.stop();
         timer.start(focusMs);
+        haptic("light");
+        sfx("start");
       }
     };
     const unsub = nav.addListener?.("focus", onFocus);
     return () => unsub?.();
-  }, [nav, current?.id, focusMs, timer]);
+  }, [nav, current?.id, focusMs, timer, haptic, sfx]);
 
   useEffect(() => {
     (async () => {
@@ -153,11 +156,23 @@ export default function FocusSessionScreen() {
         <Text style={s.timer}>{formatMMSS(timer.remaining)}</Text>
         <View style={s.row}>
           {timer.paused ? (
-            <Pressable style={[s.btn, s.primary]} onPress={timer.resume}>
+            <Pressable
+              style={[s.btn, s.primary]}
+              onPress={() => {
+                haptic("light");
+                timer.resume();
+              }}
+            >
               <Text style={s.btnTextPrimary}>계속하기</Text>
             </Pressable>
           ) : (
-            <Pressable style={[s.btn, s.secondary]} onPress={timer.pause}>
+            <Pressable
+              style={[s.btn, s.secondary]}
+              onPress={() => {
+                haptic("light");
+                timer.pause();
+              }}
+            >
               <Text style={s.btnTextSecondary}>잠시 멈추기</Text>
             </Pressable>
           )}
