@@ -40,7 +40,11 @@ export default function RootNavigator() {
         <Stack.Screen
           name="CourseSummary"
           component={CourseSummaryScreen}
-          options={{ title: "오늘의 기록" }}
+          options={{
+            presentation: "fullScreenModal",
+            animation: "fade",
+            headerShown: false,
+          }}
         />
         <Stack.Screen
           name="ItemDetail"

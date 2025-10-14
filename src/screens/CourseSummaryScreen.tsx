@@ -1,5 +1,5 @@
-import { useMemo, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useMemo, useCallback, useRef, useEffect } from "react";
+import { View, Text, StyleSheet, Pressable, Animated, Easing } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useRootNav } from "@/navigation/hooks";
@@ -26,25 +26,38 @@ export default function CourseSummaryScreen() {
     );
   }, [nav]);
 
+  const fade = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: 250,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [fade]);
+
   return (
     <SafeAreaView style={s.wrap} edges={["top", "left", "right"]}>
-      <View style={s.card}>
-        <Text style={s.title}>오늘의 집중 기록</Text>
+      <Animated.View style={[s.card, { opacity: fade }]}>
+        <Text style={s.title}>오늘의 초밥 코스</Text>
         {finished ? (
           <>
-            <Text style={s.subtitle}>오늘 완성한 초밥: {acquiredCount}개</Text>
-            <Row label="세션 진행" value={progress} />
-            <Row label="집중 시간(분)" value={String(focusMin)} />
-            <Row label="휴식 시간(분)" value={String(breakMin)} />
+            <Text style={s.subtitle}>
+              맛있게 드셨나요? 오늘은 <Text style={s.highlight}>{acquiredCount}</Text>점의 초밥을
+              완성했어요.
+            </Text>
+            <Row label="진행 세션" value={progress} />
+            <Row label="집중 시간" value={`${focusMin}분`} />
+            <Row label="쉬는 시간" value={`${breakMin}분`} />
           </>
         ) : (
-          <Text style={s.empty}>아직 요약할 기록이 없어요.</Text>
+          <Text style={s.empty}>아직 코스를 완료하지 않았어요.</Text>
         )}
 
         <Pressable style={s.cta} onPress={goHome} accessibilityRole="button">
           <Text style={s.ctaText}>홈으로 돌아가기</Text>
         </Pressable>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -76,7 +89,8 @@ const s = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: { fontSize: 22, fontWeight: "800", marginBottom: 6, color: colors.ink },
-  subtitle: { fontSize: 14, color: colors.subtitle, marginBottom: 12 },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 12 },
+  highlight: { color: colors.primary, fontWeight: "900" },
   row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 },
   label: { color: colors.ink, fontSize: 15, fontWeight: "700" },
   value: { color: colors.ink, fontSize: 16, fontWeight: "800" },
