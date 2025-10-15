@@ -2,32 +2,71 @@
   "expo": {
     "name": "Focusushi",
     "slug": "focusushi",
-    "scheme": "focusushi",
     "version": "1.0.0",
+    "scheme": "focusushi",
     "orientation": "portrait",
-    "icon": "./assets/app-icon.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0A0A0A"
     },
+
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#FFF8E1",
+          "sounds": []
+        }
+      ]
+    ],
+
+    "ios": {
+      "bundleIdentifier": "com.yourname.focusushi",
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"],
+        "NSUserTrackingUsageDescription": "맞춤형 기능 제공을 위해 앱 사용 정보를 활용할 수 있어요.",
+        "NSCalendarsUsageDescription": "알림·일정 설정을 위해 접근이 필요할 수 있어요."
+      }
+    },
+
     "android": {
+      "package": "com.yourname.focusushi",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFF8E1"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.focusushi.app"
+      "permissions": ["android.permission.POST_NOTIFICATIONS", "android.permission.VIBRATE"],
+      "icon": "./assets/icon.png",
+      "notification": {
+        "icon": "./assets/notification-icon.png",
+        "color": "#FFF8E1"
+      },
+      "edgeToEdge": true
     },
-    "ios": {
-      "bundleIdentifier": "com.focusushi.app",
-      "supportsTablet": false
+
+    "web": {
+      "favicon": "./assets/icon.png"
     },
+
+    "updates": {
+      "url": "https://u.expo.dev/00000000-0000-0000-0000-000000000000",
+      "checkAutomatically": "ON_LOAD"
+    },
+
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+
     "extra": {
       "eas": {
-        "projectId": "focusushi"
+        "projectId": "00000000-0000-0000-0000-000000000000"
       }
     }
   }
