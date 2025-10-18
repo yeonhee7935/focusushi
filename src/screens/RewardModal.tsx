@@ -113,7 +113,7 @@ export default function RewardModal() {
     return (
       <View style={s.dim}>
         <View style={s.card}>
-          <Text style={s.title}>준비된 초밥이 없어요</Text>
+          <Text style={s.title}>준비된 요리가 없어요</Text>
           <Text style={s.subtitle}>다음에 다시 받아볼까요?</Text>
           <Pressable style={[s.btn, s.secondary]} onPress={onEnd}>
             <Text style={s.btnTextSecondary}>코스 종료</Text>
@@ -134,13 +134,13 @@ export default function RewardModal() {
   return (
     <View style={s.dim} accessible accessibilityLabel="Reward Modal">
       <Animated.View style={[s.card, { transform: [{ scale: popScale }], opacity: popOpacity }]}>
-        <Text style={s.title}>초밥이 나왔습니다!</Text>
+        <Text style={s.title}>요리가 완성되었습니다.</Text>
         <Text style={s.name}>{reward.name}</Text>
 
         <View style={s.row}>
           {!finishedUI && (
             <Pressable style={[s.btn, s.primary]} onPress={onNext}>
-              <Text style={s.btnTextPrimary}>다음 세션 진행</Text>
+              <Text style={s.btnTextPrimary}>다음 요리</Text>
             </Pressable>
           )}
           {!finishedUI && (

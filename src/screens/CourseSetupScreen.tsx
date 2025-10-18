@@ -7,6 +7,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
@@ -45,84 +46,102 @@ export default function CourseSetupScreen() {
   }, [nav]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.select({ ios: "padding", android: undefined })}
-      style={s.wrap}
-    >
-      <Pressable style={s.backdrop} onPress={close} />
-      <View style={s.sheet} accessible accessibilityLabel="Course Setup Sheet">
-        <Text style={s.title}>집중 세션 설정</Text>
-        <Text style={s.subtitle}>오늘은 몇 접시쯤 완성해볼까요?</Text>
+    <Modal visible animationType="fade" transparent statusBarTranslucent onRequestClose={close}>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: "padding", android: undefined })}
+        style={s.wrap}
+      >
+        <Pressable style={s.backdrop} onPress={close} />
+        <View style={s.card} accessible accessibilityLabel="메뉴 고르기 모달">
+          <Text style={s.title}>메뉴판 둘러보기</Text>
+          <Text style={s.subtitle}>오늘은 어떤 코스로 준비할까요.</Text>
 
-        <View style={s.row}>
-          <Text style={s.label}>세션 수 (연속으로 진행)</Text>
-          <TextInput
-            style={s.input}
-            value={planned}
-            onChangeText={setPlanned}
-            keyboardType="number-pad"
-            maxLength={2}
-            placeholder="3"
-            placeholderTextColor={colors.subtitle}
-          />
+          <View style={s.row}>
+            <Text style={s.label}>요리 개수</Text>
+            <TextInput
+              style={s.input}
+              value={planned}
+              onChangeText={setPlanned}
+              keyboardType="number-pad"
+              maxLength={2}
+              placeholder="3"
+              placeholderTextColor={colors.subtitle}
+              accessibilityLabel="요리 개수 입력"
+            />
+          </View>
+
+          <View style={s.row}>
+            <Text style={s.label}>요리 시간 (분)</Text>
+            <TextInput
+              style={s.input}
+              value={focusMin}
+              onChangeText={setFocusMin}
+              keyboardType="number-pad"
+              maxLength={3}
+              placeholder="25"
+              placeholderTextColor={colors.subtitle}
+              accessibilityLabel="요리 시간 입력"
+            />
+          </View>
+
+          <View style={s.row}>
+            <Text style={s.label}>식사 시간 (분)</Text>
+            <TextInput
+              style={s.input}
+              value={breakMin}
+              onChangeText={setBreakMin}
+              keyboardType="number-pad"
+              maxLength={2}
+              placeholder="5"
+              placeholderTextColor={colors.subtitle}
+              accessibilityLabel="식사 시간 입력"
+            />
+          </View>
+
+          <Pressable
+            onPress={onStart}
+            disabled={!valid}
+            style={[s.cta, !valid && s.ctaDisabled]}
+            accessibilityRole="button"
+          >
+            <Text style={s.ctaText}>{valid ? "주문하기" : "입력을 확인하세요"}</Text>
+          </Pressable>
+
+          <Pressable onPress={close} style={s.secondaryBtn}>
+            <Text style={s.secondaryText}>돌아가기</Text>
+          </Pressable>
         </View>
-
-        <View style={s.row}>
-          <Text style={s.label}>집중 시간 (분)</Text>
-          <TextInput
-            style={s.input}
-            value={focusMin}
-            onChangeText={setFocusMin}
-            keyboardType="number-pad"
-            maxLength={3}
-            placeholder="25"
-            placeholderTextColor={colors.subtitle}
-          />
-        </View>
-
-        <View style={s.row}>
-          <Text style={s.label}>휴식 시간 (분)</Text>
-          <TextInput
-            style={s.input}
-            value={breakMin}
-            onChangeText={setBreakMin}
-            keyboardType="number-pad"
-            maxLength={2}
-            placeholder="5"
-            placeholderTextColor={colors.subtitle}
-          />
-        </View>
-
-        <Pressable
-          onPress={onStart}
-          disabled={!valid}
-          style={[s.cta, !valid && s.ctaDisabled]}
-          accessibilityRole="button"
-        >
-          <Text style={s.ctaText}>{valid ? "시작하기" : "입력을 확인하세요"}</Text>
-        </Pressable>
-
-        <Pressable onPress={close} style={s.secondaryBtn}>
-          <Text style={s.secondaryText}>닫기</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </Modal>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "#0005" },
-  sheet: {
+  wrap: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#0008",
+  },
+  card: {
+    width: "90%",
+    maxWidth: 520,
     backgroundColor: colors.surface,
-    padding: 36,
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    padding: 28,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.stroke,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
   },
-  title: { fontSize: 22, fontWeight: "800", color: colors.ink },
-  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 18 },
+  title: { fontSize: 20, fontWeight: "800", color: colors.ink },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginTop: 6, marginBottom: 18 },
   row: { marginBottom: 14 },
   label: { fontSize: 15, color: colors.ink, fontWeight: "600", marginBottom: 6 },
   input: {

@@ -43,23 +43,19 @@ export default function CourseSummaryScreen() {
   return (
     <View style={s.wrap}>
       <Animated.View style={[s.card, { opacity: fade }]}>
-        <Text style={s.title}>오늘의 초밥 코스</Text>
+        <Text style={s.title}>오늘의 코스가 완료되었습니다.</Text>
         {finished ? (
           <>
             <Text style={s.subtitle}>
-              맛있게 드셨나요? 오늘은 <Text style={s.highlight}>{acquiredCount}</Text>점의 초밥을
-              완성했어요.
+              오늘은 <Text style={s.highlight}>{acquiredCount}</Text>개의 메뉴를 드셨군요.
             </Text>
-            <Row label="진행 세션" value={progress} />
-            <Row label="집중 시간" value={`${focusMin}분`} />
-            <Row label="쉬는 시간" value={`${breakMin}분`} />
           </>
         ) : (
           <Text style={s.empty}>아직 코스를 완료하지 않았어요.</Text>
         )}
 
         <Pressable style={s.cta} onPress={goHome} accessibilityRole="button">
-          <Text style={s.ctaText}>홈으로 돌아가기</Text>
+          <Text style={s.ctaText}>처음으로</Text>
         </Pressable>
       </Animated.View>
     </View>

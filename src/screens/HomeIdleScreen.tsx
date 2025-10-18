@@ -14,12 +14,8 @@ export default function HomeIdleScreen() {
   return (
     <SafeAreaView style={s.wrap}>
       <View style={s.center}>
-        <Text style={s.title}>포커스시</Text>
-        <Text style={s.subtitle}>어서 오세요. </Text>
-        <Text style={s.subtitle}>초밥을 만들어드릴게요.</Text>
-
         <Pressable style={s.cta} onPress={onStart} accessibilityRole="button">
-          <Text style={s.ctaText}>집중 시작하기</Text>
+          <Text style={s.ctaText}>메뉴판 둘러보기</Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -29,7 +25,6 @@ export default function HomeIdleScreen() {
 const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: colors.surface },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  title: { fontSize: 34, fontWeight: "800", color: colors.ink, marginBottom: 16 },
   subtitle: { fontSize: 16, color: colors.subtitle, textAlign: "center" },
   cta: {
     paddingHorizontal: 32,

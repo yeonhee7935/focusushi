@@ -90,10 +90,9 @@ export default function BreakSheet() {
       />
       <View style={s.overlay} />
       <View style={s.center}>
-        <Text style={s.title}>휴식 시간</Text>
         <Text style={s.timer}>{formatMMSS(remaining)}</Text>
         <Pressable style={[s.btn, s.primary]} onPress={onClose}>
-          <Text style={s.btnTextPrimary}>휴식 종료</Text>
+          <Text style={s.btnTextPrimary}>식사 종료</Text>
         </Pressable>
       </View>
     </View>
