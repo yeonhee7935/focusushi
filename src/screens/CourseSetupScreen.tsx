@@ -53,9 +53,8 @@ export default function CourseSetupScreen() {
       >
         <Pressable style={s.backdrop} onPress={close} />
         <View style={s.card} accessible accessibilityLabel="메뉴 고르기 모달">
-          <Text style={s.title}>메뉴판 둘러보기</Text>
-          <Text style={s.subtitle}>오늘은 어떤 코스로 준비할까요.</Text>
-
+          <Text style={s.title}>주문서</Text>
+          <Text style={s.subtitle}>아래 내용을 알려주세요. 그에 맞는 요리를 만들어드릴게요.</Text>
           <View style={s.row}>
             <Text style={s.label}>요리 개수</Text>
             <TextInput
@@ -69,7 +68,6 @@ export default function CourseSetupScreen() {
               accessibilityLabel="요리 개수 입력"
             />
           </View>
-
           <View style={s.row}>
             <Text style={s.label}>요리 시간 (분)</Text>
             <TextInput
@@ -83,7 +81,6 @@ export default function CourseSetupScreen() {
               accessibilityLabel="요리 시간 입력"
             />
           </View>
-
           <View style={s.row}>
             <Text style={s.label}>식사 시간 (분)</Text>
             <TextInput
@@ -97,7 +94,6 @@ export default function CourseSetupScreen() {
               accessibilityLabel="식사 시간 입력"
             />
           </View>
-
           <Pressable
             onPress={onStart}
             disabled={!valid}
@@ -106,7 +102,6 @@ export default function CourseSetupScreen() {
           >
             <Text style={s.ctaText}>{valid ? "주문하기" : "입력을 확인하세요"}</Text>
           </Pressable>
-
           <Pressable onPress={close} style={s.secondaryBtn}>
             <Text style={s.secondaryText}>돌아가기</Text>
           </Pressable>
@@ -140,8 +135,8 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 10,
   },
-  title: { fontSize: 20, fontWeight: "800", color: colors.ink },
-  subtitle: { fontSize: 15, color: colors.subtitle, marginTop: 6, marginBottom: 18 },
+  title: { fontSize: 20, fontWeight: "800", color: colors.ink, marginBottom: 16 },
+  subtitle: { fontSize: 15, color: colors.subtitle, marginBottom: 16 },
   row: { marginBottom: 14 },
   label: { fontSize: 15, color: colors.ink, fontWeight: "600", marginBottom: 6 },
   input: {

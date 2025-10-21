@@ -150,9 +150,7 @@ export default function FocusSessionScreen() {
         allowsPictureInPicture={false}
       />
       <View style={s.center}>
-        <Text style={s.badge}>
-          {current.completedSessions}/{current.plannedSessions} 요리 완성 중
-        </Text>
+        <Text style={s.badge}>{current.completedSessions + 1}번째 요리 만드는 중</Text>
         <Text style={s.timer}>{formatMMSS(timer.remaining)}</Text>
         <View style={s.row}>
           {timer.paused ? (

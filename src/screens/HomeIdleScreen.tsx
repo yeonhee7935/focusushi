@@ -15,7 +15,7 @@ export default function HomeIdleScreen() {
     <SafeAreaView style={s.wrap}>
       <View style={s.center}>
         <Pressable style={s.cta} onPress={onStart} accessibilityRole="button">
-          <Text style={s.ctaText}>메뉴판 둘러보기</Text>
+          <Text style={s.ctaText}>주문하기</Text>
         </Pressable>
       </View>
     </SafeAreaView>

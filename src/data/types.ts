@@ -7,7 +7,7 @@ export interface FoodItem {
   name: string;
   category: FoodCategory;
   rarity: Rarity;
-  image: string;
+  image: number;
   description?: string;
 }
 
