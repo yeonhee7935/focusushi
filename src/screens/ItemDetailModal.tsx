@@ -57,6 +57,7 @@ export default function ItemDetailModal() {
   if (!item) {
     return (
       <View style={s.dim}>
+        <Pressable style={s.backdrop} onPress={close} />
         <View style={s.card}>
           <Text>아이템을 찾을 수 없습니다.</Text>
         </View>
@@ -71,42 +72,50 @@ export default function ItemDetailModal() {
         <View style={s.thumb} />
         <Text style={s.title}>{item.name}</Text>
 
-        <Text style={[s.meta, s.metaPill]}>{rarityKo(item.rarity)}</Text>
-        <Text style={s.meta}>먹어본 횟수: {ownedCount}</Text>
+        <View style={s.rarityContainer}>
+          <Text style={[s.rarityLabel]}>{rarityKo(item.rarity)} 등급</Text>
+          <Text style={s.meta}>({item.rarity})</Text>
+        </View>
+
+        <Text style={s.countText}>총 보유: {ownedCount}개</Text>
 
         <View style={s.section}>
-          <Text style={s.sectionTitle}>최근에 받은 초밥</Text>
           {itemLogs.length === 0 ? (
             <Text style={s.empty}>아직 기록이 없어요</Text>
           ) : (
-            itemLogs.map((l) => (
-              <Text key={l.acquiredAt} style={s.log}>
-                {new Date(l.acquiredAt).toLocaleString()}
-              </Text>
-            ))
+            <View>
+              {" "}
+              <Text style={s.sectionTitle}>최근에 받은 초밥</Text>
+              {itemLogs.map((l) => (
+                <Text key={l.acquiredAt} style={s.log}>
+                  {new Date(l.acquiredAt).toLocaleString()}
+                </Text>
+              ))}
+            </View>
           )}
         </View>
-
-        <Pressable style={s.btn} onPress={close} accessibilityRole="button">
-          <Text style={s.btnText}>닫기</Text>
-        </Pressable>
       </SafeAreaView>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  dim: { flex: 1, backgroundColor: "#0006", justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFillObject },
+  dim: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
   sheet: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
+    backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    borderTopWidth: 1,
-    borderColor: colors.stroke,
+    paddingVertical: 36,
+    paddingHorizontal: 36,
+    alignItems: "center",
   },
   card: {
     width: "86%",
@@ -120,14 +129,44 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   thumb: {
-    height: 140,
-    borderRadius: 12,
-    backgroundColor: "#F7F3EC",
-    borderWidth: 1,
-    borderColor: colors.stroke,
+    width: 120,
+    height: 120,
+    backgroundColor: "#f3f3f3",
+    borderRadius: 20,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  title: { fontSize: 22, fontWeight: "800", marginTop: 12, color: colors.ink },
-  meta: { color: colors.ink, marginTop: 6, fontSize: 14 },
+  title: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#111",
+    marginTop: 16,
+    textAlign: "center",
+  },
+  meta: {
+    fontSize: 13,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 0,
+  },
+  rarityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  rarityLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#007AFF",
+    marginRight: 5,
+    alignSelf: "auto",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    borderWidth: 0,
+    borderRadius: 0,
+    backgroundColor: "transparent",
+  },
   metaPill: {
     alignSelf: "flex-start",
     backgroundColor: "#fff2ee",
@@ -138,16 +177,28 @@ const s = StyleSheet.create({
     borderRadius: 999,
     fontWeight: "800",
   },
-  section: { marginTop: 18 },
-  sectionTitle: { fontSize: 15, fontWeight: "800", marginBottom: 8, color: colors.ink },
-  empty: { color: colors.subtitle },
-  log: { color: colors.ink, marginTop: 4, fontSize: 14 },
+  countText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111",
+    marginTop: 15,
+    marginBottom: 20,
+  },
+  section: { marginTop: 20, alignItems: "center" },
+  sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 8, color: "#111" },
+  empty: { color: "#666", fontSize: 14 },
+  log: { color: "#333", marginTop: 4, fontSize: 14 },
   btn: {
-    marginTop: 18,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
     alignItems: "center",
   },
-  btnText: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  btnText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
 });

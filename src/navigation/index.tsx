@@ -49,7 +49,13 @@ export default function RootNavigator() {
         <Stack.Screen
           name="ItemDetail"
           component={ItemDetailModal}
-          options={{ title: "상세", presentation: "modal", animation: "slide_from_bottom" }}
+          options={{
+            title: "상세",
+            presentation: "transparentModal",
+            animation: "slide_from_bottom",
+            headerShown: false,
+            contentStyle: { backgroundColor: "#0006" },
+          }}
         />
         <Stack.Screen
           name="BreakSheet"
