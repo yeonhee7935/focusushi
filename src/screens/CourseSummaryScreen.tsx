@@ -29,7 +29,6 @@ function SushiCard({ item }: { item: CourseItem }) {
 
   const food = FOODS.find((food) => food.id === item.itemId);
   const img = food?.image || require("../../assets/sushi/unknown.png");
-  console.log(food);
   return (
     <View style={[cardStyles.card, { width: cardWidth }]}>
       <View style={s.menuCard}>
@@ -74,7 +73,6 @@ export default function CourseSummaryScreen() {
   const renderItem = ({ item }: { item: CourseItem }) => {
     return <SushiCard item={item} />;
   };
-  console.log(snap);
   return (
     <View style={s.wrap}>
       <Animated.View style={[s.card, { opacity: fade }]}>
