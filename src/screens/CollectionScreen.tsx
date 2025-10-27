@@ -1,65 +1,18 @@
 import { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Image,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { FOODS } from "../data/foods";
 import { useAcquisition } from "../hooks/useAcquisition";
-import type { FoodItem, Rarity, FoodCategory } from "../data/types";
 import { useRootNav } from "../navigation/hooks";
 import { colors } from "../theme/colors";
+import GridView from "@/components/pages/CollectionScreen/GridView";
+import CalendarView from "@/components/pages/CollectionScreen/CalendarView";
 
-function SushiCard({
-  item,
-  locked,
-  width,
-  onPress,
-}: {
-  item: FoodItem;
-  locked: boolean;
-  width: number;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[cardStyles.card, { width }]}
-      accessibilityRole="button"
-      accessibilityLabel={`${item.name}${locked ? ", 잠김" : ""}`}
-      testID={`SushiCard_${item.id}`}
-    >
-      <View style={cardStyles.imageBox}>
-        {locked ? (
-          <Ionicons name="lock-closed" size={32} color={colors.subtitle} />
-        ) : (
-          <Image source={item.image} resizeMode="contain" style={cardStyles.image} />
-        )}
-      </View>
-      <Text style={[cardStyles.name, locked && cardStyles.nameLocked]} numberOfLines={1}>
-        {item.name}
-      </Text>
-    </Pressable>
-  );
-}
+type ViewMode = "grid" | "calendar";
 
 export default function CollectionScreen() {
   const logs = useAcquisition((s) => s.logs);
   const nav = useRootNav();
-  const [raritySet, setRaritySet] = useState<Set<Rarity>>(new Set());
-  const [categorySet, setCategorySet] = useState<Set<FoodCategory>>(new Set());
-
-  const { width: screenW } = useWindowDimensions();
-  const H_PADDING = 12;
-  const GAP = 12;
-  const COLUMNS = 3;
-  const cardWidth = (screenW - H_PADDING * 2 - GAP * (COLUMNS - 1)) / COLUMNS;
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   const ownedSet = useMemo(() => {
     const s = new Set<string>();
@@ -67,45 +20,31 @@ export default function CollectionScreen() {
     return s;
   }, [logs]);
 
-  const filtered = useMemo(() => {
-    return FOODS.filter((f) => {
-      const rOk = raritySet.size === 0 || raritySet.has(f.rarity);
-      const cOk = categorySet.size === 0 || categorySet.has(f.category);
-      return rOk && cOk;
-    });
-  }, [raritySet, categorySet]);
-
-  const data = useMemo(() => {
-    const arr = [...filtered];
-    arr.sort((a, b) => a.name.localeCompare(b.name));
-    return arr;
-  }, [filtered, ownedSet]);
-
-  const renderItem = ({ item }: { item: FoodItem }) => {
-    const locked = !ownedSet.has(item.id);
-    return (
-      <SushiCard
-        item={item}
-        locked={locked}
-        width={cardWidth}
-        onPress={() => nav.navigate("ItemDetail", { itemId: item.id })}
-      />
-    );
-  };
-
   return (
     <SafeAreaView style={s.wrap} edges={["top", "left", "right"]}>
       <Text style={s.title}>내가 완성한 초밥들</Text>
       <Text style={s.subtitle}>집중으로 완성한 초밥이 여기에 모여요.</Text>
 
-      <FlatList
-        data={data}
-        keyExtractor={(it) => it.id}
-        numColumns={3}
-        columnWrapperStyle={[s.col, { gap: GAP }]}
-        renderItem={renderItem}
-        contentContainerStyle={[s.list, { paddingHorizontal: H_PADDING, gap: GAP }]}
-      />
+      <View style={s.toggleContainer}>
+        <Pressable
+          style={[s.toggleBtn, viewMode === "grid" && s.toggleBtnActive]}
+          onPress={() => setViewMode("grid")}
+        >
+          <Text style={[s.toggleText, viewMode === "grid" && s.toggleTextActive]}>그리드 뷰</Text>
+        </Pressable>
+        <Pressable
+          style={[s.toggleBtn, viewMode === "calendar" && s.toggleBtnActive]}
+          onPress={() => setViewMode("calendar")}
+        >
+          <Text style={[s.toggleText, viewMode === "calendar" && s.toggleTextActive]}>달력 뷰</Text>
+        </Pressable>
+      </View>
+
+      {viewMode === "grid" ? (
+        <GridView ownedSet={ownedSet} nav={nav} />
+      ) : (
+        <CalendarView logs={logs} nav={nav} />
+      )}
     </SafeAreaView>
   );
 }
@@ -120,42 +59,36 @@ const s = StyleSheet.create({
     paddingTop: 12,
   },
   subtitle: { fontSize: 14, color: colors.subtitle, paddingHorizontal: 16, marginTop: 4 },
-  list: { paddingTop: 12, paddingBottom: 12 },
-  col: { justifyContent: "space-between" },
-});
-
-const cardStyles = StyleSheet.create({
-  card: {
+  toggleContainer: {
+    flexDirection: "row",
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    padding: 4,
+  },
+  toggleBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  toggleBtnActive: {
     backgroundColor: "#fff",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.stroke,
-    padding: 10,
-    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  imageBox: {
-    backgroundColor: "#fff2ddff",
-    borderRadius: 12,
-    width: "100%",
-    aspectRatio: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.stroke,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  name: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: colors.ink,
-    marginTop: 10,
-    textAlign: "center",
-  },
-  nameLocked: {
+  toggleText: {
+    fontSize: 15,
+    fontWeight: "600",
     color: colors.subtitle,
+  },
+  toggleTextActive: {
+    color: colors.ink,
+    fontWeight: "800",
   },
 });
