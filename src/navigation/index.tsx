@@ -35,7 +35,12 @@ export default function RootNavigator() {
         <Stack.Screen
           name="CourseSetup"
           component={CourseSetupScreen}
-          options={{ presentation: "transparentModal", headerShown: false }}
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            headerShown: false,
+            contentStyle: { backgroundColor: "#0006" },
+          }}
         />
         <Stack.Screen
           name="CourseSummary"

@@ -36,12 +36,3 @@ export interface Course {
   breakMs: number;
   items: CourseItem[];
 }
-
-export const RARITY_WEIGHTS: Record<Rarity, number> = {
-  COMMON: 70,
-  UNCOMMON: 20,
-  RARE: 7,
-  EPIC: 2,
-  LEGENDARY: 1,
-  ULTRA_RARE: 0.5,
-};

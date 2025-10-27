@@ -1,34 +1,17 @@
 import { useMemo, useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
-import type { RootStackParamList } from "../navigation/types";
-import { FOODS } from "../data/foods";
-import { useAcquisition } from "../hooks/useAcquisition";
+import type { RootStackParamList } from "@/navigation/types";
+import { FOODS } from "@/data/foods";
+import { RARITY_WEIGHTS } from "@/data/constants";
+import { useAcquisition } from "@/hooks/useAcquisition";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRootNav } from "../navigation/hooks";
-import { colors } from "../theme/colors";
+import { useRootNav } from "@/navigation/hooks";
+import { colors } from "@/theme/colors";
+import { Ionicons } from "@expo/vector-icons";
 
 type R = RouteProp<RootStackParamList, "ItemDetail">;
-
-function rarityKo(r: string) {
-  switch (r) {
-    case "COMMON":
-      return "보통";
-    case "UNCOMMON":
-      return "조금 특별";
-    case "RARE":
-      return "레어";
-    case "EPIC":
-      return "에픽";
-    case "LEGENDARY":
-      return "전설";
-    case "ULTRA_RARE":
-      return "극레어";
-    default:
-      return r;
-  }
-}
 
 export default function ItemDetailModal() {
   const nav = useRootNav();
@@ -39,16 +22,8 @@ export default function ItemDetailModal() {
     () => FOODS.find((f) => f.id === route.params.itemId) ?? null,
     [route.params.itemId],
   );
-  const itemLogs = useMemo(
-    () =>
-      logs
-        .filter((l) => l.itemId === route.params.itemId)
-        .slice(-5)
-        .reverse(),
-    [logs, route.params.itemId],
-  );
-  const ownedCount = useMemo(
-    () => logs.filter((l) => l.itemId === route.params.itemId).length,
+  const locked = useMemo<boolean>(
+    () => logs.filter((l) => l.itemId === route.params.itemId).length === 0,
     [logs, route.params.itemId],
   );
 
@@ -69,30 +44,19 @@ export default function ItemDetailModal() {
     <View style={s.dim}>
       <Pressable style={s.backdrop} onPress={close} />
       <SafeAreaView style={s.sheet} edges={["bottom"]}>
-        <View style={s.thumb} />
-        <Text style={s.title}>{item.name}</Text>
-
-        <View style={s.rarityContainer}>
-          <Text style={[s.rarityLabel]}>{rarityKo(item.rarity)} 등급</Text>
-          <Text style={s.meta}>({item.rarity})</Text>
-        </View>
-
-        <Text style={s.countText}>총 보유: {ownedCount}개</Text>
-
-        <View style={s.section}>
-          {itemLogs.length === 0 ? (
-            <Text style={s.empty}>아직 기록이 없어요</Text>
+        <View style={s.thumb}>
+          {locked ? (
+            <Ionicons name="lock-closed" size={32} color={colors.subtitle} />
           ) : (
-            <View>
-              <Text style={s.sectionTitle}>최근에 받은 초밥</Text>
-              {itemLogs.map((l) => (
-                <Text key={l.acquiredAt} style={s.log}>
-                  {new Date(l.acquiredAt).toLocaleString()}
-                </Text>
-              ))}
-            </View>
+            <Image style={s.image} source={item.image} />
           )}
         </View>
+        <Text style={s.title}>{item.name}</Text>
+        <View style={s.rarity}>
+          <Text style={[s.rarityLabel]}>{RARITY_WEIGHTS[item.rarity]}</Text>
+          <Text style={s.rarityDescription}>%의 확률로 얻을 수 있어요!</Text>
+        </View>
+        <Text style={s.description}>{item.description}</Text>
       </SafeAreaView>
     </View>
   );
@@ -136,6 +100,10 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
   title: {
     fontSize: 24,
     fontWeight: "900",
@@ -149,23 +117,32 @@ const s = StyleSheet.create({
     textAlign: "center",
     marginTop: 0,
   },
-  rarityContainer: {
+  rarity: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 5,
+    backgroundColor: "rgba(0,122,255,0.1)",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    margin: 16,
   },
   rarityLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
-    color: "#007AFF",
-    marginRight: 5,
+    color: "#007affff",
     alignSelf: "auto",
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: "transparent",
   },
+  rarityDescription: {
+    color: "#007AFF",
+    fontSize: 14,
+    fontWeight: "400",
+  },
+  description: { textAlign: "center" },
   metaPill: {
     alignSelf: "flex-start",
     backgroundColor: "#fff2ee",
