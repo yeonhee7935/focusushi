@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { View, Text, Pressable, StyleSheet, AppState } from "react-native";
+import { View, Text, Pressable, StyleSheet, AppState, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { formatMMSS } from "../utils/time";
@@ -81,28 +81,28 @@ export default function BreakSheet() {
 
   return (
     <View style={s.wrap} accessible accessibilityLabel="Break Fullscreen">
-      <VideoView
-        style={s.bgVideo}
-        player={player}
-        contentFit="cover"
-        allowsFullscreen={false}
-        allowsPictureInPicture={false}
-      />
-      <View style={s.overlay} />
       <View style={s.center}>
         <Text style={s.timer}>{formatMMSS(remaining)}</Text>
+        <VideoView
+          style={s.bgVideo}
+          player={player}
+          contentFit="cover"
+          allowsFullscreen={false}
+          allowsPictureInPicture={false}
+        />
         <Pressable style={[s.btn, s.primary]} onPress={onClose}>
-          <Text style={s.btnTextPrimary}>식사 종료</Text>
+          <Text style={s.btnTextPrimary}>휴식 종료</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const maxSize = Math.min(screenWidth, screenHeight) * 0.9;
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: "#000" },
-  bgVideo: { ...StyleSheet.absoluteFillObject },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "#00000066" },
+  wrap: { flex: 1, backgroundColor: "black" },
+  bgVideo: { width: maxSize, height: maxSize, marginBottom: 22 },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   title: { fontSize: 20, fontWeight: "800", marginBottom: 12, color: "#fff" },
   timer: { fontSize: 44, fontWeight: "900", marginBottom: 20, color: "#fff" },
