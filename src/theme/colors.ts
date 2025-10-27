@@ -13,3 +13,11 @@ export const colors = {
   primary: "#FF715B",
   primaryTextOn: "#FFFFFF",
 };
+export const darkColors = {
+  surface: "#000000",
+  ink: "#E5E5E5",
+  subtitle: "#A0A0A0",
+  stroke: "#2D2D2D",
+  primary: "#FF715B",
+  primaryTextOn: "#1A1A1A",
+};

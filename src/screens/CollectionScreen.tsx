@@ -134,7 +134,7 @@ const cardStyles = StyleSheet.create({
     alignItems: "center",
   },
   imageBox: {
-    backgroundColor: "#F7F3EC",
+    backgroundColor: "#fff2ddff",
     borderRadius: 12,
     width: "100%",
     aspectRatio: 1,

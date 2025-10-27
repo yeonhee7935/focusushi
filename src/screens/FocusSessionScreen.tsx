@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
-import { View, Text, Pressable, StyleSheet, Alert, AppState } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert, AppState, Dimensions } from "react-native";
 import { useCourse } from "../hooks/useCourse";
 import { useSnapshotPersistence } from "../hooks/useSnapshot";
 import { formatMMSS } from "../utils/time";
 import { useRootNav } from "../navigation/hooks";
 import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 import { cancelNotification, scheduleLocal } from "../lib/notifications";
-import { colors } from "../theme/colors";
+import { darkColors } from "../theme/colors";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useFeedback } from "../hooks/useFeedback";
 
@@ -142,16 +142,17 @@ export default function FocusSessionScreen() {
 
   return (
     <View style={s.wrap}>
-      <VideoView
-        style={s.bgVideo}
-        player={player}
-        contentFit="cover"
-        allowsFullscreen={false}
-        allowsPictureInPicture={false}
-      />
       <View style={s.center}>
         <Text style={s.badge}>{current.completedSessions + 1}번째 요리 만드는 중</Text>
         <Text style={s.timer}>{formatMMSS(timer.remaining)}</Text>
+
+        <VideoView
+          style={s.bgVideo}
+          player={player}
+          contentFit="cover"
+          allowsFullscreen={false}
+          allowsPictureInPicture={false}
+        />
         <View style={s.row}>
           {timer.paused ? (
             <Pressable
@@ -182,27 +183,35 @@ export default function FocusSessionScreen() {
     </View>
   );
 }
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const maxSize = Math.min(screenWidth, screenHeight) * 0.9;
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: colors.surface },
-  bgVideo: { ...StyleSheet.absoluteFillObject },
+  wrap: { flex: 1, backgroundColor: "black" },
+  bgVideo: { width: maxSize, height: maxSize, marginBottom: 22 },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  badge: { fontSize: 14, color: colors.subtitle, marginBottom: 10 },
-  timer: { fontSize: 64, fontWeight: "800", letterSpacing: 1, marginBottom: 22, color: colors.ink },
+  badge: { fontSize: 14, color: darkColors.subtitle, marginBottom: 10 },
+  timer: {
+    fontSize: 64,
+    fontWeight: "800",
+    letterSpacing: 1,
+    marginBottom: 22,
+    color: darkColors.ink,
+  },
   row: { flexDirection: "row", gap: 12 },
   btn: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, borderWidth: 1 },
-  primary: { backgroundColor: colors.primary, borderColor: colors.primary },
-  secondary: { backgroundColor: "#fff", borderColor: colors.stroke },
+  primary: { backgroundColor: darkColors.primary, borderColor: darkColors.primary },
+  secondary: { backgroundColor: "#fff", borderColor: darkColors.stroke },
   danger: { backgroundColor: "#fff0f0", borderColor: "#e74c3c" },
-  btnTextPrimary: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
-  btnTextSecondary: { color: colors.ink, fontWeight: "700", fontSize: 16 },
+  btnTextPrimary: { color: darkColors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  btnTextSecondary: { color: darkColors.stroke, fontWeight: "700", fontSize: 16 },
   btnTextDanger: { color: "#e74c3c", fontWeight: "700", fontSize: 16 },
-  title: { fontSize: 20, fontWeight: "800", marginBottom: 14, color: colors.ink },
+  title: { fontSize: 20, fontWeight: "800", marginBottom: 14, color: darkColors.ink },
   cta: {
-    backgroundColor: colors.primary,
+    backgroundColor: darkColors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 10,
   },
-  ctaText: { color: colors.primaryTextOn, fontWeight: "800", fontSize: 16 },
+  ctaText: { color: darkColors.primaryTextOn, fontWeight: "800", fontSize: 16 },
 });

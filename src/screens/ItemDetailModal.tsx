@@ -84,7 +84,6 @@ export default function ItemDetailModal() {
             <Text style={s.empty}>아직 기록이 없어요</Text>
           ) : (
             <View>
-              {" "}
               <Text style={s.sectionTitle}>최근에 받은 초밥</Text>
               {itemLogs.map((l) => (
                 <Text key={l.acquiredAt} style={s.log}>

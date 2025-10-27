@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Image,
 } from "react-native";
 import { useAcquisition } from "../hooks/useAcquisition";
 import { useCourse } from "../hooks/useCourse";
@@ -135,6 +136,9 @@ export default function RewardModal() {
     <View style={s.dim} accessible accessibilityLabel="Reward Modal">
       <Animated.View style={[s.card, { transform: [{ scale: popScale }], opacity: popOpacity }]}>
         <Text style={s.title}>요리가 완성되었습니다.</Text>
+
+        <Image source={reward.image} style={s.image} />
+
         <Text style={s.name}>{reward.name}</Text>
 
         <View style={s.row}>
@@ -182,6 +186,12 @@ const s = StyleSheet.create({
     marginBottom: 18,
     color: colors.ink,
     textAlign: "center",
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    marginVertical: 16,
   },
   row: { flexDirection: "row", gap: 12, flexWrap: "wrap", justifyContent: "center" },
   btn: {

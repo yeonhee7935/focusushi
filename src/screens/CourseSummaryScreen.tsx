@@ -1,12 +1,46 @@
-import { useMemo, useCallback, useRef, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, Animated, Easing } from "react-native";
+import { useCallback, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Easing,
+  FlatList,
+  Image,
+  useWindowDimensions,
+} from "react-native";
 import { CommonActions, useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
 import { useCourse } from "../hooks/useCourse";
 import { useRootNav } from "@/navigation/hooks";
 import { colors } from "../theme/colors";
 import type { RootStackParamList } from "../navigation/types";
+import { CourseItem } from "@/data/types";
+import { FOODS } from "@/data/foods";
 
+const H_PADDING = 12;
+const GAP = 12;
+const COLUMNS = 3;
+
+function SushiCard({ item }: { item: CourseItem }) {
+  const { width: screenW } = useWindowDimensions();
+  const cardWidth = (screenW - H_PADDING * 2 - GAP * (COLUMNS - 1)) / COLUMNS;
+
+  const food = FOODS.find((food) => food.id === item.itemId);
+  const img = food?.image || require("../../assets/sushi/unknown.png");
+  console.log(food);
+  return (
+    <View style={[cardStyles.card, { width: cardWidth }]}>
+      <View style={s.menuCard}>
+        <Image source={img} style={s.menuImage} resizeMode="contain" />
+      </View>
+      <Text style={s.menuName} numberOfLines={1}>
+        {food?.name}
+      </Text>
+    </View>
+  );
+}
 export default function CourseSummaryScreen() {
   const nav = useRootNav();
   const route = useRoute<RouteProp<RootStackParamList, "CourseSummary">>();
@@ -16,10 +50,7 @@ export default function CourseSummaryScreen() {
   const finished = Boolean(snap) || history.length > 0;
   const source = snap ?? (history.length ? history[history.length - 1] : null);
 
-  const progress = finished ? `${source!.completedSessions}/${source!.plannedSessions}` : "0/0";
   const acquiredCount = finished ? source!.items.length : 0;
-  const focusMin = finished ? Math.round(source!.focusMs / 60000) : 0;
-  const breakMin = finished ? Math.round(source!.breakMs / 60000) : 0;
 
   const goHome = useCallback(() => {
     nav.dispatch(
@@ -40,15 +71,27 @@ export default function CourseSummaryScreen() {
     }).start();
   }, [fade]);
 
+  const renderItem = ({ item }: { item: CourseItem }) => {
+    return <SushiCard item={item} />;
+  };
+  console.log(snap);
   return (
     <View style={s.wrap}>
       <Animated.View style={[s.card, { opacity: fade }]}>
-        <Text style={s.title}>오늘의 코스가 완료되었습니다.</Text>
+        <Text style={s.title}>코스 요약</Text>
         {finished ? (
           <>
             <Text style={s.subtitle}>
-              오늘은 <Text style={s.highlight}>{acquiredCount}</Text>개의 메뉴를 드셨군요.
+              <Text style={s.highlight}>{acquiredCount}</Text>개의 메뉴를 드셨군요.
             </Text>
+            <FlatList
+              data={snap?.items}
+              keyExtractor={(item, index) => `${item.itemId}-${index}`}
+              numColumns={3}
+              columnWrapperStyle={[s.col, { gap: GAP }]}
+              renderItem={renderItem}
+              contentContainerStyle={[s.list, { paddingHorizontal: H_PADDING, gap: GAP }]}
+            />
           </>
         ) : (
           <Text style={s.empty}>아직 코스를 완료하지 않았어요.</Text>
@@ -58,15 +101,6 @@ export default function CourseSummaryScreen() {
           <Text style={s.ctaText}>처음으로</Text>
         </Pressable>
       </Animated.View>
-    </View>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={s.row}>
-      <Text style={s.label}>{label}</Text>
-      <Text style={s.value}>{value}</Text>
     </View>
   );
 }
@@ -125,4 +159,69 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   ctaText: { color: colors.primaryTextOn, fontSize: 17, fontWeight: "800" },
+  menuCard: {
+    backgroundColor: "#F7F3EC",
+    borderRadius: 12,
+    width: "100%",
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.stroke,
+  },
+  menuImage: {
+    width: "100%",
+    height: "100%",
+  },
+  menuInitial: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: colors.subtitle,
+  },
+  menuName: {
+    fontSize: 17,
+    fontWeight: "800",
+    color: colors.ink,
+    marginTop: 10,
+    textAlign: "center",
+  },
+  list: { paddingTop: 12, paddingBottom: 12 },
+  col: { justifyContent: "space-between" },
+});
+
+const cardStyles = StyleSheet.create({
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.stroke,
+    padding: 10,
+    alignItems: "center",
+  },
+  imageBox: {
+    backgroundColor: "#F7F3EC",
+    borderRadius: 12,
+    width: "100%",
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.stroke,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  name: {
+    fontSize: 17,
+    fontWeight: "800",
+    color: colors.ink,
+    marginTop: 10,
+    textAlign: "center",
+  },
+  nameLocked: {
+    color: colors.subtitle,
+  },
 });
