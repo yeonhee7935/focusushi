@@ -15,7 +15,6 @@
 
 <img width="1242" height="2688" alt="Frame 69" src="https://github.com/user-attachments/assets/3990ee65-c284-42d8-afaf-d3592e45af0c" />
 
-
 ---
 
 ## 2. 주요 기능
@@ -63,6 +62,7 @@ iPhone 설정 > 알림 > 포커스시 > 알림 허용을 활성화해주세요.
 ## 5. 개인정보 보호
 
 포커스시는 사용자의 개인정보를 수집하거나 외부로 전송하지 않습니다.
+[개인정보 처리방침](/PRIVACY_POLICY.md)
 
 ---
 
