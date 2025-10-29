@@ -11,6 +11,10 @@
 포커스시는 집중 시간과 휴식 시간을 설정하여 효율적으로 업무나 공부를 진행할 수 있는 포모도로 타이머 앱입니다.  
 사용자는 집중 세션을 완료할 때마다 초밥이 한 점 완성되는 시각적 보상을 받을 수 있습니다.  
 집중 기록은 자동으로 저장되며, 완성된 초밥을 컬렉션 화면에서 확인할 수 있습니다.
+<img width="1024" height="1024" alt="icon" src="https://github.com/user-attachments/assets/fd6054bf-9858-486b-b1f4-6abbda605cdc" />
+
+<img width="1242" height="2688" alt="Frame 69" src="https://github.com/user-attachments/assets/3990ee65-c284-42d8-afaf-d3592e45af0c" />
+
 
 ---
 
