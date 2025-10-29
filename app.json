@@ -8,13 +8,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#0A0A0A"
     },
-
     "plugins": [
       [
         "expo-notifications",
@@ -25,24 +23,29 @@
         }
       ]
     ],
-
     "ios": {
-      "bundleIdentifier": "com.yourname.focusushi",
+      "bundleIdentifier": "com.yuni053.focusushi",
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
+        "UIBackgroundModes": [
+          "remote-notification",
+          "remote-notification"
+        ],
         "NSUserTrackingUsageDescription": "맞춤형 기능 제공을 위해 앱 사용 정보를 활용할 수 있어요.",
-        "NSCalendarsUsageDescription": "알림·일정 설정을 위해 접근이 필요할 수 있어요."
+        "NSCalendarsUsageDescription": "알림·일정 설정을 위해 접근이 필요할 수 있어요.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
-
     "android": {
-      "package": "com.yourname.focusushi",
+      "package": "com.yuni053.focusushi",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFF8E1"
       },
-      "permissions": ["android.permission.POST_NOTIFICATIONS", "android.permission.VIBRATE"],
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ],
       "icon": "./assets/icon.png",
       "notification": {
         "icon": "./assets/notification-icon.png",
@@ -50,24 +53,21 @@
       },
       "edgeToEdge": true
     },
-
     "web": {
       "favicon": "./assets/icon.png"
     },
-
     "updates": {
       "url": "https://u.expo.dev/00000000-0000-0000-0000-000000000000",
       "checkAutomatically": "ON_LOAD"
     },
-
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
-
     "extra": {
       "eas": {
-        "projectId": "00000000-0000-0000-0000-000000000000"
+        "projectId": "a5bd9b5b-5c2b-4901-9328-8851a626bb10"
       }
-    }
+    },
+    "owner": "yuni7935"
   }
 }

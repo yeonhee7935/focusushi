@@ -84,9 +84,8 @@ export default function CourseSummaryScreen() {
             </Text>
             <FlatList
               data={snap?.items}
+              horizontal={true}
               keyExtractor={(item, index) => `${item.itemId}-${index}`}
-              numColumns={3}
-              columnWrapperStyle={[s.col, { gap: GAP }]}
               renderItem={renderItem}
               contentContainerStyle={[s.list, { paddingHorizontal: H_PADDING, gap: GAP }]}
             />
